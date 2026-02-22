@@ -1,34 +1,114 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TeleBail</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      font-family: Arial;
-      padding-top: 100px;
-    }
-    button {
-      background: red;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 10px;
-    }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeleBail</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0f172a;
+  color:white;
+}
+
+.header{
+  background:#17212b;
+  padding:15px;
+  font-size:20px;
+  font-weight:bold;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.search{
+  padding:10px;
+  background:#111b24;
+}
+
+.search input{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#1e293b;
+  color:white;
+}
+
+.chat{
+  display:flex;
+  align-items:center;
+  padding:15px;
+  border-bottom:1px solid #1f2937;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.chat:hover{
+  background:#1e293b;
+}
+
+.avatar{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  margin-right:12px;
+}
+
+.name{
+  font-weight:bold;
+}
+
+.message{
+  font-size:13px;
+  color:gray;
+}
+
+.badge{
+  background:red;
+  padding:3px 7px;
+  border-radius:12px;
+  font-size:12px;
+  margin-left:auto;
+}
+
+</style>
 </head>
+
 <body>
 
-  <h1>Welcome to TeleBail</h1>
-  <p>Official Web App</p>
+<div class="header">
+  TeleBail
+  <span>🔍</span>
+</div>
 
-  <button onclick="alert('Appeal sent to BailPro Bot')">
-    Send Appeal
-  </button>
+<div class="search">
+  <input type="text" placeholder="Search">
+</div>
+
+<div class="chat" onclick="openChat('BailPro Bot')">
+  <div class="avatar" style="background:#2563eb;"></div>
+  <div>
+    <div class="name">BailPro Bot</div>
+    <div class="message">Appeal system active...</div>
+  </div>
+  <div class="badge">1</div>
+</div>
+
+<div class="chat" onclick="openChat('Spam Report')">
+  <div class="avatar" style="background:red;"></div>
+  <div>
+    <div class="name">Spam Report</div>
+    <div class="message">Last report sent</div>
+  </div>
+</div>
+
+<script>
+function openChat(name){
+  alert(name + " chat opened");
+}
+</script>
 
 </body>
 </html>
