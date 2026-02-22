@@ -9,84 +9,93 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:linear-gradient(to bottom,#1e1b4b,#312e81);
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
 color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-/* TOP BAR */
-.topbar{
-position:fixed;
-top:0;
-left:0;
-width:100%;
+.container{
+width:90%;
+max-width:420px;
+background:rgba(255,255,255,0.05);
+padding:25px;
+border-radius:20px;
+backdrop-filter:blur(15px);
+position:relative;
+}
+
+.top{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:15px 20px;
-box-sizing:border-box;
-z-index:1000;
+margin-bottom:15px;
 }
 
 .logo{
 display:flex;
 align-items:center;
-gap:10px;
-font-size:20px;
+gap:8px;
 font-weight:bold;
+font-size:20px;
 }
 
-.logo img{
+.logo-box{
 width:35px;
 height:35px;
 border-radius:10px;
+background:linear-gradient(45deg,red,blue);
+display:flex;
+justify-content:center;
+align-items:center;
+font-weight:bold;
 }
 
 select{
-background:#4338ca;
-color:white;
+background:rgba(255,255,255,0.1);
 border:none;
-padding:6px 10px;
+color:white;
+padding:5px;
 border-radius:8px;
-}
-
-/* CARD */
-.container{
-margin-top:120px;
-display:flex;
-justify-content:center;
-}
-
-.card{
-width:90%;
-max-width:400px;
-background:rgba(255,255,255,0.05);
-padding:30px;
-border-radius:20px;
-backdrop-filter:blur(10px);
 }
 
 h2{
 text-align:center;
+margin:10px 0 5px 0;
+}
+
+p.subtitle{
+text-align:center;
+opacity:0.7;
+margin-bottom:20px;
+}
+
+label{
+font-size:14px;
+opacity:0.8;
 }
 
 input{
 width:100%;
 padding:12px;
-margin:8px 0 18px 0;
+margin:5px 0 15px 0;
 border:none;
 border-radius:10px;
-background:rgba(255,255,255,0.08);
+background:rgba(255,255,255,0.1);
 color:white;
+outline:none;
 }
 
 button{
 width:100%;
 padding:12px;
 border:none;
-border-radius:10px;
-background:linear-gradient(to right,#ef4444,#6366f1);
+border-radius:12px;
+background:linear-gradient(90deg,red,purple,blue);
 color:white;
-font-size:16px;
+font-weight:bold;
 cursor:pointer;
 }
 
@@ -94,137 +103,140 @@ cursor:pointer;
 text-align:center;
 margin-top:15px;
 cursor:pointer;
-color:#ddd;
+opacity:0.8;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+font-size:12px;
+opacity:0.5;
 }
 
 .hidden{display:none;}
 </style>
 </head>
-
 <body>
-
-<!-- TOP -->
-<div class="topbar">
-<div class="logo">
-<img src="https://cdn-icons-png.flaticon.com/512/9068/9068675.png">
-<span>TeleBail</span>
-</div>
-
-<select onchange="changeLang(this.value)">
-<option value="uz">O'zbek</option>
-<option value="en">English</option>
-<option value="ru">Русский</option>
-<option value="tr">Türkçe</option>
-<option value="ar">العربية</option>
-</select>
-</div>
 
 <div class="container">
 
+<div class="top">
+<div class="logo">
+<div class="logo-box">💬</div>
+TeleBail
+</div>
+
+<select>
+<option>English</option>
+<option>Русский</option>
+<option selected>O'zbek</option>
+<option>Қазақ</option>
+<option>العربية</option>
+</select>
+</div>
+
+<h2>TeleBail-ga xush kelibsiz</h2>
+<p class="subtitle">Professional muloqot platformasi</p>
+
 <!-- LOGIN -->
-<div class="card" id="login">
-<h2 id="title">TeleBail-ga xush kelibsiz</h2>
+<div id="loginPage">
 
-<label id="emailText">Email pochta</label>
-<input type="email" placeholder="example@bail.com">
+<label>Email pochta</label>
+<input type="text" id="loginEmail" placeholder="example@bail.com">
 
-<label id="passText">Parol</label>
-<input type="password">
+<label>Parol</label>
+<input type="password" id="loginPass" placeholder="******">
 
-<button id="loginBtn">Kirish</button>
+<button onclick="login()">Kirish</button>
 
-<div class="link" onclick="step1()">Ro'yxatdan o'tish</div>
+<div class="link" onclick="showRegister()">Akkount yo'qmi? Ro'yxatdan o'tish</div>
+
 </div>
 
-<!-- REGISTER STEP 1 -->
-<div class="card hidden" id="step1">
-<h2>Ism kiriting</h2>
-<input type="text">
-<button onclick="step2()">Keyingi</button>
+<!-- REGISTER -->
+<div id="registerPage" class="hidden">
+
+<label>Tug'ilgan sana</label>
+<input type="date" id="birth">
+
+<label>Email yaratish (@bail.com)</label>
+<input type="text" id="username" placeholder="example">
+
+<label>Parol (6+ harf va raqam)</label>
+<input type="password" id="regPass">
+
+<button onclick="register()">Ro'yxatdan o'tish</button>
+
+<div class="link" onclick="showLogin()">Orqaga</div>
+
 </div>
 
-<!-- REGISTER STEP 2 -->
-<div class="card hidden" id="step2">
-<h2>Tug'ilgan sana</h2>
-<input type="date">
-<button onclick="step3()">Keyingi</button>
-</div>
-
-<!-- REGISTER STEP 3 -->
-<div class="card hidden" id="step3">
-<h2>Username</h2>
-<input type="text">
-<button onclick="step4()">Keyingi</button>
-</div>
-
-<!-- REGISTER STEP 4 -->
-<div class="card hidden" id="step4">
-<h2>Parol yarating</h2>
-<input type="password">
-<button onclick="finish()">Tugatish</button>
+<div class="footer">
+© 2026 TeleBail Inc.
 </div>
 
 </div>
 
 <script>
 
-function step1(){
-document.getElementById("login").classList.add("hidden");
-document.getElementById("step1").classList.remove("hidden");
-}
-function step2(){
-document.getElementById("step1").classList.add("hidden");
-document.getElementById("step2").classList.remove("hidden");
-}
-function step3(){
-document.getElementById("step2").classList.add("hidden");
-document.getElementById("step3").classList.remove("hidden");
-}
-function step4(){
-document.getElementById("step3").classList.add("hidden");
-document.getElementById("step4").classList.remove("hidden");
-}
-function finish(){
-alert("Account yaratildi!");
+function showRegister(){
+loginPage.classList.add("hidden");
+registerPage.classList.remove("hidden");
 }
 
-function changeLang(lang){
-
-if(lang==="en"){
-title.innerText="Welcome to TeleBail";
-emailText.innerText="Email";
-passText.innerText="Password";
-loginBtn.innerText="Login";
+function showLogin(){
+registerPage.classList.add("hidden");
+loginPage.classList.remove("hidden");
 }
 
-if(lang==="ru"){
-title.innerText="Добро пожаловать в TeleBail";
-emailText.innerText="Электронная почта";
-passText.innerText="Пароль";
-loginBtn.innerText="Войти";
+function register(){
+
+let birth=new Date(document.getElementById("birth").value);
+let age=new Date().getFullYear()-birth.getFullYear();
+
+if(age<16){
+alert("16 yoshdan kichik ro'yxatdan o'ta olmaydi");
+return;
 }
 
-if(lang==="tr"){
-title.innerText="TeleBail'e hoş geldiniz";
-emailText.innerText="E-posta";
-passText.innerText="Şifre";
-loginBtn.innerText="Giriş";
+let username=document.getElementById("username").value;
+let pass=document.getElementById("regPass").value;
+
+if(username.length<3){
+alert("Username kamida 3 harf");
+return;
 }
 
-if(lang==="ar"){
-title.innerText="مرحبًا بك في TeleBail";
-emailText.innerText="البريد الإلكتروني";
-passText.innerText="كلمة المرور";
-loginBtn.innerText="تسجيل الدخول";
+if(pass.length<6 || !/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)){
+alert("Parol 6+ belgi, harf va raqam bo'lishi kerak");
+return;
 }
 
-if(lang==="uz"){
-title.innerText="TeleBail-ga xush kelibsiz";
-emailText.innerText="Email pochta";
-passText.innerText="Parol";
-loginBtn.innerText="Kirish";
+let email=username+"@bail.com";
+
+localStorage.setItem("email",email);
+localStorage.setItem("pass",pass);
+
+alert("Ro'yxatdan o'tdingiz!");
+showLogin();
 }
 
+function login(){
+
+let email=document.getElementById("loginEmail").value;
+let pass=document.getElementById("loginPass").value;
+
+if(!email.endsWith("@bail.com")){
+alert("Faqat @bail.com ruxsat etiladi");
+return;
+}
+
+if(email!==localStorage.getItem("email") || pass!==localStorage.getItem("pass")){
+alert("Email yoki parol noto'g'ri");
+return;
+}
+
+alert("Muvaffaqiyatli kirdingiz!");
 }
 
 </script>
