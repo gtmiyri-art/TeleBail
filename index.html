@@ -1,154 +1,268 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeleBail</title>
 
 <style>
 body{
-margin:0;
-font-family:Arial;
-background:#0f0f0f;
-color:white;
+  margin:0;
+  font-family:Arial;
+  background:#0f0f14;
+  color:white;
 }
 
-#loginPage{
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+.hidden{display:none}
+
+.header{
+  background:#1f1f2e;
+  padding:15px;
+  font-size:20px;
+  font-weight:bold;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.loginBox{
-width:90%;
-max-width:350px;
-background:#1c1c1c;
-padding:25px;
-border-radius:15px;
-box-shadow:0 0 20px rgba(0,0,0,0.6);
-text-align:center;
-}
-
-h2{
-color:#2AABEE;
+.container{
+  padding:20px;
 }
 
 input{
-width:100%;
-padding:12px;
-margin:10px 0;
-border-radius:8px;
-border:none;
-background:#2b2b2b;
-color:white;
-font-size:16px;
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:none;
+  border-radius:8px;
+  background:#2a2a3d;
+  color:white;
 }
 
 button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:8px;
-background:#2AABEE;
-color:white;
-font-size:16px;
-cursor:pointer;
-}
-
-#chatPage{
-display:none;
-}
-
-.topbar{
-background:#1f1f1f;
-padding:15px;
-font-size:20px;
-border-bottom:1px solid #333;
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  background:linear-gradient(45deg,#ff003c,#4a00ff);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 .chat{
-display:flex;
-align-items:center;
-padding:15px;
-border-bottom:1px solid #222;
+  padding:15px;
+  border-bottom:1px solid #2a2a3d;
+  cursor:pointer;
 }
 
-.avatar{
-width:45px;
-height:45px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-margin-right:15px;
+.chat:hover{
+  background:#1a1a25;
 }
 
-.blue{ background:#2AABEE; }
-.yellow{ background:#f1c40f; color:black; }
-
-.name{
-font-weight:bold;
+.message-box{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
 }
 
-.last{
-color:gray;
-font-size:14px;
+.message-box input{
+  flex:1;
+  border-radius:0;
+}
+
+.message-box button{
+  width:80px;
+  border-radius:0;
+}
+
+.message{
+  padding:10px;
+  margin:10px;
+  background:#2a2a3d;
+  border-radius:8px;
+}
+
+.nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  background:#1f1f2e;
+}
+
+.nav button{
+  background:none;
+  border:none;
+  color:white;
+  flex:1;
+  padding:15px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginPage">
-<div class="loginBox">
-<h2>TeleBail</h2>
-<input type="text" id="user" placeholder="Telefon raqam">
-<input type="password" id="pass" placeholder="Parol">
-<button onclick="login()">Kirish</button>
-</div>
-</div>
-
-<!-- CHAT -->
-<div id="chatPage">
-<div class="topbar">TeleBail</div>
-
-<div class="chat">
-<div class="avatar blue">T</div>
-<div>
-<div class="name">TeleBail Rasmiy</div>
-<div class="last">Xush kelibsiz!</div>
-</div>
+<!-- LOGIN PAGE -->
+<div id="login">
+  <div class="container">
+    <h2>TeleBail-ga xush kelibsiz</h2>
+    <input type="text" id="loginEmail" placeholder="Email yoki Raqam">
+    <input type="password" id="loginPass" placeholder="Parol">
+    <button onclick="login()">Kirish</button>
+    <p onclick="showRegister()" style="cursor:pointer;text-align:center;margin-top:15px;">
+      Ro'yxatdan o'tish
+    </p>
+  </div>
 </div>
 
-<div class="chat">
-<div class="avatar yellow">A</div>
-<div>
-<div class="name">AntiBail Bot</div>
-<div class="last" id="botText">...</div>
+<!-- REGISTER PAGE -->
+<div id="register" class="hidden">
+  <div class="container">
+    <h2>Ro'yxatdan o'tish</h2>
+    <input type="text" id="regName" placeholder="Ismingiz">
+    <input type="text" id="regPhone" placeholder="Telefon raqam">
+    <input type="password" id="regPass" placeholder="Parol">
+    <button onclick="register()">Ro'yxatdan o'tish</button>
+    <p onclick="showLogin()" style="cursor:pointer;text-align:center;margin-top:15px;">
+      Kirish sahifasiga qaytish
+    </p>
+  </div>
 </div>
-</div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+
+  <div class="header">
+    TeleBail
+  </div>
+
+  <div id="chatsPage">
+    <div class="chat" onclick="openChat('AntiBail Bot')">AntiBail Bot</div>
+    <div class="chat" onclick="openChat('BailPro')">BailPro</div>
+    <div class="chat" onclick="openChat('Support')">Support</div>
+  </div>
+
+  <div id="chatPage" class="hidden">
+    <div class="header">
+      <span onclick="backChats()" style="cursor:pointer;">⬅</span>
+      <span id="chatTitle"></span>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="message-box">
+      <input type="text" id="msgInput" placeholder="Xabar yozing...">
+      <button onclick="sendMessage()">Yubor</button>
+    </div>
+  </div>
+
+  <div id="profilePage" class="hidden">
+    <div class="container">
+      <h2>Profil</h2>
+      <p id="profileName"></p>
+      <p id="profilePhone"></p>
+    </div>
+  </div>
+
+  <div id="settingsPage" class="hidden">
+    <div class="container">
+      <h2>Nastroyka</h2>
+      <button onclick="logout()">Chiqish</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button onclick="showChats()">Chatlar</button>
+    <button onclick="showProfile()">Profil</button>
+    <button onclick="showSettings()">Sozlamalar</button>
+  </div>
 
 </div>
 
 <script>
+
+let currentUser = {};
+let currentChat = "";
+
+function showRegister(){
+  login.classList.add("hidden");
+  register.classList.remove("hidden");
+}
+
+function showLogin(){
+  register.classList.add("hidden");
+  login.classList.remove("hidden");
+}
+
+function register(){
+  currentUser.name = regName.value;
+  currentUser.phone = regPhone.value;
+  currentUser.pass = regPass.value;
+
+  alert("Ro'yxatdan o'tdingiz!");
+  showLogin();
+}
+
 function login(){
-let u=document.getElementById("user").value;
-let p=document.getElementById("pass").value;
-
-if(u.length<4 || p.length<4){
-alert("Login noto‘g‘ri!");
-return;
+  if(loginPass.value === currentUser.pass){
+    login.classList.add("hidden");
+    app.classList.remove("hidden");
+    profileName.innerText = "Ism: " + currentUser.name;
+    profilePhone.innerText = "Raqam: " + currentUser.phone;
+  }else{
+    alert("Parol noto'g'ri");
+  }
 }
 
-document.getElementById("loginPage").style.display="none";
-document.getElementById("chatPage").style.display="block";
-
-setTimeout(function(){
-document.getElementById("botText").innerHTML="Siz tizimga muvaffaqiyatli kirdingiz ✅";
-},1500);
+function openChat(name){
+  currentChat = name;
+  chatsPage.classList.add("hidden");
+  chatPage.classList.remove("hidden");
+  chatTitle.innerText = name;
 }
+
+function backChats(){
+  chatPage.classList.add("hidden");
+  chatsPage.classList.remove("hidden");
+}
+
+function sendMessage(){
+  let text = msgInput.value;
+  if(text==="") return;
+
+  let div = document.createElement("div");
+  div.className="message";
+  div.innerText=text;
+  messages.appendChild(div);
+
+  msgInput.value="";
+}
+
+function showChats(){
+  chatsPage.classList.remove("hidden");
+  profilePage.classList.add("hidden");
+  settingsPage.classList.add("hidden");
+}
+
+function showProfile(){
+  chatsPage.classList.add("hidden");
+  profilePage.classList.remove("hidden");
+  settingsPage.classList.add("hidden");
+}
+
+function showSettings(){
+  chatsPage.classList.add("hidden");
+  profilePage.classList.add("hidden");
+  settingsPage.classList.remove("hidden");
+}
+
+function logout(){
+  location.reload();
+}
+
 </script>
 
 </body>
