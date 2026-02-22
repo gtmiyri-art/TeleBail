@@ -233,3 +233,239 @@ loginPage.classList.remove("hidden");
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeleBail</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#1e1b4b; /* bir xil to'q ko'k */
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+width:90%;
+max-width:420px;
+background:rgba(255,255,255,0.05);
+padding:25px;
+border-radius:20px;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:20px;
+font-weight:bold;
+}
+
+.logo-box{
+width:35px;
+height:35px;
+border-radius:10px;
+background:linear-gradient(45deg,red,blue);
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+select{
+background:rgba(255,255,255,0.1);
+border:none;
+color:white;
+padding:5px;
+border-radius:8px;
+}
+
+h2{text-align:center;margin:10px 0;}
+.subtitle{text-align:center;opacity:0.7;margin-bottom:20px;}
+
+label{font-size:14px;opacity:0.8;}
+input{
+width:100%;
+padding:12px;
+margin:5px 0 15px 0;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.1);
+color:white;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,red,purple,blue);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.link{text-align:center;margin-top:15px;cursor:pointer;opacity:0.8;}
+.hidden{display:none;}
+.footer{text-align:center;margin-top:20px;font-size:12px;opacity:0.5;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="topbar">
+<div class="logo">
+<div class="logo-box">💬</div>
+TeleBail
+</div>
+
+<select>
+<option>English</option>
+<option>Русский</option>
+<option selected>O'zbek</option>
+<option>Қазақ</option>
+<option>العربية</option>
+</select>
+</div>
+
+<h2>TeleBail-ga xush kelibsiz</h2>
+<p class="subtitle">Professional muloqot platformasi</p>
+
+<!-- LOGIN -->
+<div id="loginPage">
+<label>Email pochta</label>
+<input type="text" id="loginEmail" placeholder="example@bail.com">
+
+<label>Parol</label>
+<input type="password" id="loginPass">
+
+<button onclick="login()">Kirish</button>
+<div class="link" onclick="showStep1()">Akkount yo'qmi? Ro'yxatdan o'tish</div>
+</div>
+
+<!-- REGISTER STEP 1 -->
+<div id="step1" class="hidden">
+<label>Tug'ilgan sana</label>
+<input type="date" id="birth">
+<button onclick="nextStep1()">Keyingi</button>
+</div>
+
+<!-- REGISTER STEP 2 -->
+<div id="step2" class="hidden">
+<label>Username</label>
+<input type="text" id="username" placeholder="example">
+<button onclick="nextStep2()">Keyingi</button>
+</div>
+
+<!-- REGISTER STEP 3 -->
+<div id="step3" class="hidden">
+<label>Parol (6+ harf va raqam)</label>
+<input type="password" id="regPass">
+<button onclick="nextStep3()">Keyingi</button>
+</div>
+
+<!-- REGISTER STEP 4 -->
+<div id="step4" class="hidden">
+<p>Ro'yxatdan o'tish yakunlandi</p>
+<button onclick="finishRegister()">Tugatish</button>
+</div>
+
+<!-- HOME -->
+<div id="homePage" class="hidden">
+<h2>Xush kelibsiz!</h2>
+<p id="userEmail"></p>
+<button onclick="logout()">Chiqish</button>
+</div>
+
+<div class="footer">© 2026 TeleBail Inc.</div>
+
+</div>
+
+<script>
+
+let tempEmail="";
+let tempPass="";
+
+function showStep1(){
+loginPage.classList.add("hidden");
+step1.classList.remove("hidden");
+}
+
+function nextStep1(){
+let birth=new Date(document.getElementById("birth").value);
+let age=new Date().getFullYear()-birth.getFullYear();
+if(age<16){ alert("16 yoshdan kichik ro'yxatdan o'ta olmaydi"); return; }
+step1.classList.add("hidden");
+step2.classList.remove("hidden");
+}
+
+function nextStep2(){
+let username=document.getElementById("username").value;
+if(username.length<3){ alert("Kamida 3 harf"); return; }
+tempEmail=username+"@bail.com";
+step2.classList.add("hidden");
+step3.classList.remove("hidden");
+}
+
+function nextStep3(){
+let pass=document.getElementById("regPass").value;
+if(pass.length<6 || !/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)){
+alert("Parol 6+ belgi, harf va raqam bo'lishi kerak");
+return;
+}
+tempPass=pass;
+step3.classList.add("hidden");
+step4.classList.remove("hidden");
+}
+
+function finishRegister(){
+localStorage.setItem("email",tempEmail);
+localStorage.setItem("pass",tempPass);
+step4.classList.add("hidden");
+homePage.classList.remove("hidden");
+userEmail.innerText=tempEmail;
+}
+
+function login(){
+let email=document.getElementById("loginEmail").value;
+let pass=document.getElementById("loginPass").value;
+
+if(!email.endsWith("@bail.com")){
+alert("Faqat @bail.com ruxsat");
+return;
+}
+
+if(email!==localStorage.getItem("email") || pass!==localStorage.getItem("pass")){
+alert("Email yoki parol noto'g'ri");
+return;
+}
+
+loginPage.classList.add("hidden");
+homePage.classList.remove("hidden");
+userEmail.innerText=email;
+}
+
+function logout(){
+homePage.classList.add("hidden");
+loginPage.classList.remove("hidden");
+}
+
+</script>
+
+</body>
+</html>
