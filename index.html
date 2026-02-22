@@ -11,100 +11,88 @@ margin:0;
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 background:linear-gradient(180deg,#5b0000 0%,#000814 100%);
 color:white;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
 }
 
-/* LOGIN */
+/* TOP LOGO */
 
-.topbar{
+.top-logo{
 position:absolute;
-top:0;
-left:0;
-right:0;
-display:flex;
-justify-content:space-between;
-padding:18px;
-font-weight:600;
-}
-
-.logo{
+top:20px;
+left:20px;
 display:flex;
 align-items:center;
 gap:10px;
+font-weight:600;
 font-size:18px;
 }
 
+.logo-box{
+width:38px;
+height:38px;
+border-radius:10px;
+background:linear-gradient(135deg,#ff003c,#4a6bff);
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+/* AUTH CARD */
+
+.center{
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
 .card{
-background:rgba(20,20,20,0.85);
-padding:35px 30px;
+background:rgba(20,20,20,0.9);
+padding:35px;
 border-radius:20px;
-width:92%;
+width:90%;
 max-width:380px;
 box-shadow:0 10px 40px rgba(0,0,0,0.6);
-backdrop-filter:blur(10px);
 }
 
 .card h2{
-margin:0 0 5px;
-font-size:22px;
-}
-
-.subtitle{
-opacity:0.6;
-font-size:14px;
-margin-bottom:25px;
+margin:0 0 10px;
 }
 
 input{
 width:100%;
-padding:15px;
+padding:14px;
 margin-bottom:15px;
 border-radius:12px;
 border:none;
 background:#111;
 color:white;
-font-size:14px;
-outline:none;
-}
-
-input:focus{
-background:#1b1b1b;
 }
 
 button{
 width:100%;
-padding:15px;
+padding:14px;
 border:none;
 border-radius:12px;
 background:linear-gradient(90deg,#ff003c,#4a6bff);
 color:white;
-font-size:16px;
 font-weight:600;
 cursor:pointer;
-transition:0.2s;
 }
 
-button:active{
-transform:scale(0.97);
-}
-
-.link{
-margin-top:15px;
-text-align:center;
-font-size:13px;
-opacity:0.6;
-}
-
-/* CHAT */
-
-.chat{
-display:none;
-flex-direction:column;
-height:100vh;
+.footer{
+position:absolute;
+bottom:15px;
 width:100%;
+text-align:center;
+opacity:0.5;
+font-size:12px;
+}
+
+/* CHAT LIST */
+
+.chatlist{
+display:none;
+height:100vh;
 }
 
 .chat-header{
@@ -112,7 +100,24 @@ background:#7a0000;
 padding:18px;
 text-align:center;
 font-weight:600;
-letter-spacing:0.5px;
+}
+
+.chat-item{
+padding:15px;
+border-bottom:1px solid rgba(255,255,255,0.05);
+cursor:pointer;
+}
+
+.chat-item:hover{
+background:rgba(255,255,255,0.05);
+}
+
+/* CHAT WINDOW */
+
+.chat{
+display:none;
+flex-direction:column;
+height:100vh;
 }
 
 .messages{
@@ -123,12 +128,11 @@ padding:15px;
 
 .msg{
 max-width:75%;
-padding:12px 14px;
+padding:10px 14px;
 margin:8px 0;
 border-radius:18px;
 background:#1e1e1e;
 position:relative;
-font-size:14px;
 }
 
 .msg.self{
@@ -136,25 +140,17 @@ margin-left:auto;
 background:linear-gradient(90deg,#ff003c,#4a6bff);
 }
 
-.time{
-font-size:10px;
-opacity:0.6;
-margin-top:4px;
-text-align:right;
-}
-
 .delete{
 position:absolute;
-top:5px;
 right:8px;
-font-size:11px;
+top:5px;
+font-size:12px;
 cursor:pointer;
-opacity:0.6;
 }
 
 .send{
 display:flex;
-padding:12px;
+padding:10px;
 background:#000814;
 }
 
@@ -162,12 +158,10 @@ background:#000814;
 flex:1;
 margin:0;
 border-radius:20px;
-padding:14px;
 }
 
 .send button{
 width:auto;
-padding:0 18px;
 margin-left:10px;
 border-radius:20px;
 }
@@ -175,22 +169,29 @@ border-radius:20px;
 </head>
 <body>
 
-<div class="topbar">
-<div class="logo">💬 TeleBail</div>
-<div>O'zbek 🌍</div>
+<div class="top-logo">
+<div class="logo-box">💬</div>
+TeleBail
 </div>
 
-<div class="card" id="login">
-<h2>TeleBail-ga xush kelibsiz</h2>
-<div class="subtitle">Professional muloqot platformasi</div>
-<input type="email" placeholder="example@gmail.com" id="email">
+<div class="center" id="auth">
+<div class="card">
+<h2>Ro'yxatdan o'tish</h2>
+<input type="text" placeholder="Ism">
+<input type="email" placeholder="example@gmail.com">
 <input type="password" placeholder="Parol">
-<button onclick="enter()">Kirish</button>
-<div class="link">Akkaunt yo'qmi? Ro'yxatdan o'tish</div>
+<button onclick="enterApp()">Davom etish</button>
+</div>
+</div>
+
+<div class="chatlist" id="chatlist">
+<div class="chat-header">TeleBail</div>
+<div class="chat-item" onclick="openChat()">General Chat</div>
+<div class="chat-item" onclick="openChat()">Support</div>
 </div>
 
 <div class="chat" id="chat">
-<div class="chat-header">TeleBail Chat</div>
+<div class="chat-header" onclick="back()">⬅ Orqaga</div>
 <div class="messages" id="messages"></div>
 <div class="send">
 <input type="text" id="msgInput" placeholder="Xabar yozing...">
@@ -198,24 +199,31 @@ border-radius:20px;
 </div>
 </div>
 
+<div class="footer">© 2026 TeleBail Inc.</div>
+
 <script>
-function enter(){
-let email=document.getElementById("email").value;
-if(!email){alert("Email kiriting");return;}
-document.getElementById("login").style.display="none";
+function enterApp(){
+document.getElementById("auth").style.display="none";
+document.getElementById("chatlist").style.display="block";
+}
+
+function openChat(){
+document.getElementById("chatlist").style.display="none";
 document.getElementById("chat").style.display="flex";
 loadMessages();
+}
+
+function back(){
+document.getElementById("chat").style.display="none";
+document.getElementById("chatlist").style.display="block";
 }
 
 function sendMsg(){
 let text=document.getElementById("msgInput").value;
 if(!text)return;
 
-let now=new Date();
-let time=now.getHours()+":"+String(now.getMinutes()).padStart(2,'0');
-
 let messages=JSON.parse(localStorage.getItem("telebail"))||[];
-messages.push({text:text,time:time});
+messages.push(text);
 localStorage.setItem("telebail",JSON.stringify(messages));
 
 document.getElementById("msgInput").value="";
@@ -230,22 +238,4 @@ let messages=JSON.parse(localStorage.getItem("telebail"))||[];
 messages.forEach((m,i)=>{
 let div=document.createElement("div");
 div.className="msg self";
-div.innerHTML=
-m.text+
-'<div class="time">'+m.time+'</div>'+
-'<div class="delete" onclick="deleteMsg('+i+')">✖</div>';
-container.appendChild(div);
-});
-container.scrollTop=container.scrollHeight;
-}
-
-function deleteMsg(index){
-let messages=JSON.parse(localStorage.getItem("telebail"))||[];
-messages.splice(index,1);
-localStorage.setItem("telebail",JSON.stringify(messages));
-loadMessages();
-}
-</script>
-
-</body>
-</html>
+div.innerHTML=m+' <span class="delete" onclick="deleteMsg('+i+')">✖</span>';
