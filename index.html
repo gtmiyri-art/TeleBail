@@ -6,65 +6,66 @@
 <title>TeleBail</title>
 
 <style>
+*{box-sizing:border-box}
 body{
 margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-background:linear-gradient(180deg,#5b0000 0%,#000814 100%);
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+background:#0e1621;
 color:white;
 }
 
-/* TOP LOGO */
+/* HEADER */
 
-.top-logo{
-position:absolute;
-top:20px;
-left:20px;
+.header{
+background:#17212b;
+padding:15px;
+font-size:18px;
+font-weight:600;
 display:flex;
 align-items:center;
 gap:10px;
-font-weight:600;
-font-size:18px;
 }
 
-.logo-box{
-width:38px;
-height:38px;
-border-radius:10px;
+.logo{
+width:34px;
+height:34px;
+border-radius:8px;
 background:linear-gradient(135deg,#ff003c,#4a6bff);
 display:flex;
 align-items:center;
 justify-content:center;
 }
 
-/* AUTH CARD */
+/* AUTH */
 
-.center{
+.auth{
 display:flex;
+flex-direction:column;
 justify-content:center;
 align-items:center;
 height:100vh;
+background:linear-gradient(180deg,#5b0000,#000814);
 }
 
 .card{
-background:rgba(20,20,20,0.9);
-padding:35px;
-border-radius:20px;
+background:#17212b;
+padding:30px;
+border-radius:14px;
 width:90%;
 max-width:380px;
-box-shadow:0 10px 40px rgba(0,0,0,0.6);
 }
 
 .card h2{
-margin:0 0 10px;
+margin-top:0;
 }
 
 input{
 width:100%;
 padding:14px;
 margin-bottom:15px;
-border-radius:12px;
+border-radius:8px;
 border:none;
-background:#111;
+background:#0e1621;
 color:white;
 }
 
@@ -72,44 +73,57 @@ button{
 width:100%;
 padding:14px;
 border:none;
-border-radius:12px;
-background:linear-gradient(90deg,#ff003c,#4a6bff);
+border-radius:8px;
+background:#2aabee;
 color:white;
 font-weight:600;
 cursor:pointer;
 }
 
 .footer{
-position:absolute;
-bottom:15px;
-width:100%;
 text-align:center;
-opacity:0.5;
+margin-top:15px;
 font-size:12px;
+opacity:0.6;
 }
 
 /* CHAT LIST */
 
 .chatlist{
 display:none;
-height:100vh;
-}
-
-.chat-header{
-background:#7a0000;
-padding:18px;
-text-align:center;
-font-weight:600;
 }
 
 .chat-item{
+display:flex;
+align-items:center;
+gap:12px;
 padding:15px;
-border-bottom:1px solid rgba(255,255,255,0.05);
+border-bottom:1px solid #1f2a36;
 cursor:pointer;
 }
 
-.chat-item:hover{
-background:rgba(255,255,255,0.05);
+.avatar{
+width:45px;
+height:45px;
+border-radius:50%;
+background:#2aabee;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+}
+
+.chat-info{
+flex:1;
+}
+
+.chat-name{
+font-weight:600;
+}
+
+.chat-preview{
+font-size:13px;
+opacity:0.6;
 }
 
 /* CHAT WINDOW */
@@ -124,34 +138,26 @@ height:100vh;
 flex:1;
 overflow-y:auto;
 padding:15px;
+background:#0e1621;
 }
 
 .msg{
-max-width:75%;
+max-width:70%;
 padding:10px 14px;
 margin:8px 0;
 border-radius:18px;
-background:#1e1e1e;
-position:relative;
+background:#182533;
 }
 
 .msg.self{
 margin-left:auto;
-background:linear-gradient(90deg,#ff003c,#4a6bff);
-}
-
-.delete{
-position:absolute;
-right:8px;
-top:5px;
-font-size:12px;
-cursor:pointer;
+background:#2aabee;
 }
 
 .send{
 display:flex;
 padding:10px;
-background:#000814;
+background:#17212b;
 }
 
 .send input{
@@ -169,37 +175,47 @@ border-radius:20px;
 </head>
 <body>
 
-<div class="top-logo">
-<div class="logo-box">💬</div>
-TeleBail
-</div>
+<!-- AUTH PAGE -->
 
-<div class="center" id="auth">
+<div class="auth" id="auth">
 <div class="card">
 <h2>Ro'yxatdan o'tish</h2>
 <input type="text" placeholder="Ism">
 <input type="email" placeholder="example@gmail.com">
 <input type="password" placeholder="Parol">
 <button onclick="enterApp()">Davom etish</button>
+<div class="footer">© 2026 TeleBail Inc.</div>
 </div>
 </div>
+
+<!-- CHAT LIST -->
 
 <div class="chatlist" id="chatlist">
-<div class="chat-header">TeleBail</div>
-<div class="chat-item" onclick="openChat()">General Chat</div>
-<div class="chat-item" onclick="openChat()">Support</div>
+<div class="header">
+<div class="logo">💬</div>
+TeleBail
 </div>
 
+<div class="chat-item" onclick="openChat()">
+<div class="avatar">G</div>
+<div class="chat-info">
+<div class="chat-name">General</div>
+<div class="chat-preview">Oxirgi xabar...</div>
+</div>
+</div>
+
+</div>
+
+<!-- CHAT -->
+
 <div class="chat" id="chat">
-<div class="chat-header" onclick="back()">⬅ Orqaga</div>
+<div class="header" onclick="back()">⬅ General</div>
 <div class="messages" id="messages"></div>
 <div class="send">
 <input type="text" id="msgInput" placeholder="Xabar yozing...">
-<button onclick="sendMsg()">➤</button>
+<button onclick="sendMsg()">Yuborish</button>
 </div>
 </div>
-
-<div class="footer">© 2026 TeleBail Inc.</div>
 
 <script>
 function enterApp(){
@@ -235,19 +251,12 @@ let container=document.getElementById("messages");
 container.innerHTML="";
 let messages=JSON.parse(localStorage.getItem("telebail"))||[];
 
-messages.forEach((m,i)=>{
+messages.forEach(m=>{
 let div=document.createElement("div");
 div.className="msg self";
-div.innerHTML=m+' <span class="delete" onclick="deleteMsg('+i+')">✖</span>';
+div.innerText=m;
 container.appendChild(div);
 });
-}
-
-function deleteMsg(i){
-let messages=JSON.parse(localStorage.getItem("telebail"))||[];
-messages.splice(i,1);
-localStorage.setItem("telebail",JSON.stringify(messages));
-loadMessages();
 }
 </script>
 
