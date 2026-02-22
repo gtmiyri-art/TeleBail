@@ -3,203 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleBail 2.0</title>
+<title>TeleBail</title>
 
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-  color:white;
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-/* HEADER */
-.header{
-  padding:15px;
-  font-size:20px;
-  font-weight:bold;
+.box{
+width:90%;
+max-width:400px;
+background:rgba(255,255,255,0.05);
+padding:20px;
+border-radius:20px;
+backdrop-filter:blur(10px);
 }
 
-/* SEARCH */
-.search-box{
-  margin:10px;
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+outline:none;
+background:rgba(255,255,255,0.1);
+color:white;
 }
 
-.search-box input{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:20px;
-  outline:none;
-  background:rgba(255,255,255,0.1);
-  color:white;
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:linear-gradient(90deg,red,blue);
+color:white;
+font-weight:bold;
+cursor:pointer;
 }
 
-/* CHAT LIST */
-.chat-list{
-  padding:10px;
-  padding-bottom:120px;
-}
-
-.chat{
-  display:flex;
-  align-items:center;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:15px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(10px);
-  cursor:pointer;
-}
-
-.chat img{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  margin-right:10px;
-}
-
-.chat-name{
-  font-weight:bold;
-}
-
-.chat-message{
-  font-size:13px;
-  opacity:0.7;
-}
-
-/* CHAT WINDOW */
-.chat-window{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:#111;
-  padding:15px;
-  box-sizing:border-box;
-}
-
-.chat-window h3{
-  margin-top:0;
-}
-
-.back-btn{
-  margin-bottom:10px;
-  cursor:pointer;
-  color:#ff4d6d;
-}
-
-/* BOTTOM NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:15px;
-  left:50%;
-  transform:translateX(-50%);
-  width:90%;
-  height:65px;
-  background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(20px);
-  border-radius:30px;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  box-shadow:0 0 20px rgba(255,0,80,0.4);
-}
-
-.nav-item{
-  font-size:22px;
-  opacity:0.6;
-  cursor:pointer;
-}
-
-.nav-item.active{
-  background:linear-gradient(45deg,#ff0057,#ff7b00);
-  padding:12px;
-  border-radius:50%;
-  opacity:1;
-  box-shadow:0 0 15px #ff0057;
-}
-
-.profile-img{
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  border:2px solid #ff0057;
-}
+.hidden{display:none;}
+.center{text-align:center;}
+img{width:80px;height:80px;border-radius:50%;margin-top:10px;}
 </style>
 </head>
 <body>
 
-<div class="header">TeleBail Messages</div>
+<div class="box">
 
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search...">
+<!-- LOGIN -->
+<div id="loginPage">
+<h2 class="center">TeleBail Login</h2>
+<input type="text" id="loginEmail" placeholder="example@bail.com">
+<input type="password" id="loginPass" placeholder="Parol">
+<button onclick="login()">Kirish</button>
+<p class="center" onclick="showRegister()" style="cursor:pointer;">Ro'yxatdan o'tish</p>
 </div>
 
-<div class="chat-list" id="chatList">
-
-  <div class="chat" onclick="openChat('AntiBail Bot')">
-    <img src="https://i.pravatar.cc/150?img=12">
-    <div>
-      <div class="chat-name">AntiBail Bot</div>
-      <div class="chat-message">Rasmiy kod yuborildi</div>
-    </div>
-  </div>
-
-  <div class="chat" onclick="openChat('BailPro Support')">
-    <img src="https://i.pravatar.cc/150?img=32">
-    <div>
-      <div class="chat-name">BailPro Support</div>
-      <div class="chat-message">Appeal yuboring</div>
-    </div>
-  </div>
-
-  <div class="chat" onclick="openChat('TeleBail Admin')">
-    <img src="https://i.pravatar.cc/150?img=45">
-    <div>
-      <div class="chat-name">TeleBail Admin</div>
-      <div class="chat-message">Online</div>
-    </div>
-  </div>
-
+<!-- STEP 1 AGE -->
+<div id="agePage" class="hidden">
+<h3>Tug'ilgan sana</h3>
+<input type="date" id="birth">
+<button onclick="checkAge()">Davom etish</button>
 </div>
 
-<!-- CHAT WINDOW -->
-<div class="chat-window" id="chatWindow">
-  <div class="back-btn" onclick="closeChat()">⬅ Back</div>
-  <h3 id="chatTitle"></h3>
-  <p>Bu yerda chat yozish funksiyasi keyingi versiyada qo‘shiladi.</p>
+<!-- STEP 2 EMAIL -->
+<div id="emailPage" class="hidden">
+<h3>Email yaratish</h3>
+<input type="text" id="username" placeholder="example">
+<p>@bail.com</p>
+<button onclick="saveEmail()">Davom etish</button>
 </div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="nav-item active">💬</div>
-  <div class="nav-item">👤</div>
-  <div class="nav-item">⚙️</div>
-  <img src="https://i.pravatar.cc/150?img=5" class="profile-img">
+<!-- STEP 3 PASSWORD -->
+<div id="passPage" class="hidden">
+<h3>Parol qo'yish</h3>
+<input type="password" id="regPass">
+<button onclick="savePass()">Davom etish</button>
+</div>
+
+<!-- STEP 4 PROFILE -->
+<div id="profilePage" class="hidden">
+<h3>Profil</h3>
+<input type="text" id="name" placeholder="Ism">
+<input type="text" id="surname" placeholder="Familiya">
+<input type="file" id="photo">
+<button onclick="finishRegister()">Saqlash</button>
+</div>
+
+<!-- HOME -->
+<div id="homePage" class="hidden center">
+<h2>Xush kelibsiz!</h2>
+<img id="userImg">
+<h3 id="userName"></h3>
+<button onclick="logout()">Chiqish</button>
+</div>
+
 </div>
 
 <script>
-function openChat(name){
-  document.getElementById("chatTitle").innerText = name;
-  document.getElementById("chatWindow").style.display = "block";
+let tempEmail="";
+let tempPass="";
+
+function showRegister(){
+loginPage.classList.add("hidden");
+agePage.classList.remove("hidden");
 }
 
-function closeChat(){
-  document.getElementById("chatWindow").style.display = "none";
+function checkAge(){
+let birth=new Date(document.getElementById("birth").value);
+let age=new Date().getFullYear()-birth.getFullYear();
+if(age<16){
+alert("Siz 16 yoshdan kichiksiz");
+}else{
+agePage.classList.add("hidden");
+emailPage.classList.remove("hidden");
+}
 }
 
-document.getElementById("searchInput").addEventListener("keyup", function(){
-  let filter = this.value.toLowerCase();
-  let chats = document.getElementsByClassName("chat");
+function saveEmail(){
+let username=document.getElementById("username").value;
+if(username.length<3){
+alert("Username kamida 3 harf");
+return;
+}
+tempEmail=username+"@bail.com";
+emailPage.classList.add("hidden");
+passPage.classList.remove("hidden");
+}
 
-  for(let i=0;i<chats.length;i++){
-    let name = chats[i].innerText.toLowerCase();
-    chats[i].style.display = name.includes(filter) ? "" : "none";
-  }
-});
+function savePass(){
+let pass=document.getElementById("regPass").value;
+if(pass.length<6 || !/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)){
+alert("Parol 6+ belgi, harf va raqam bo'lishi kerak");
+return;
+}
+tempPass=pass;
+passPage.classList.add("hidden");
+profilePage.classList.remove("hidden");
+}
+
+function finishRegister(){
+let name=document.getElementById("name").value;
+let surname=document.getElementById("surname").value;
+let photo=document.getElementById("photo").files[0];
+
+let reader=new FileReader();
+reader.onload=function(){
+localStorage.setItem("email",tempEmail);
+localStorage.setItem("pass",tempPass);
+localStorage.setItem("name",name+" "+surname);
+localStorage.setItem("photo",reader.result);
+alert("Ro'yxatdan o'tdingiz!");
+location.reload();
+}
+if(photo){
+reader.readAsDataURL(photo);
+}else{
+alert("Rasm tanlang");
+}
+}
+
+function login(){
+let email=document.getElementById("loginEmail").value;
+let pass=document.getElementById("loginPass").value;
+
+if(email!==localStorage.getItem("email") || pass!==localStorage.getItem("pass")){
+alert("Noto'g'ri email yoki parol");
+return;
+}
+
+loginPage.classList.add("hidden");
+homePage.classList.remove("hidden");
+
+userName.innerText=localStorage.getItem("name");
+userImg.src=localStorage.getItem("photo");
+}
+
+function logout(){
+location.reload();
+}
 </script>
 
 </body>
