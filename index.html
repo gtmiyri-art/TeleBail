@@ -9,6 +9,251 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+width:90%;
+max-width:420px;
+background:rgba(255,255,255,0.05);
+padding:25px;
+border-radius:20px;
+backdrop-filter:blur(15px);
+position:relative;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:8px;
+font-weight:bold;
+font-size:20px;
+}
+
+.logo-box{
+width:35px;
+height:35px;
+border-radius:10px;
+background:linear-gradient(45deg,red,blue);
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+select{
+background:rgba(255,255,255,0.1);
+border:none;
+color:white;
+padding:5px;
+border-radius:8px;
+}
+
+h2{
+text-align:center;
+margin:10px 0 5px 0;
+}
+
+.subtitle{
+text-align:center;
+opacity:0.7;
+margin-bottom:20px;
+}
+
+.label{
+font-size:14px;
+margin-bottom:5px;
+opacity:0.8;
+display:block;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.1);
+color:white;
+outline:none;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,red,purple,blue);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.link{
+text-align:center;
+margin-top:15px;
+cursor:pointer;
+opacity:0.8;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+font-size:12px;
+opacity:0.5;
+}
+
+.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="top">
+<div class="logo">
+<div class="logo-box">💬</div>
+TeleBail
+</div>
+
+<select>
+<option>English</option>
+<option>Русский</option>
+<option selected>O'zbek</option>
+<option>Қазақ</option>
+<option>العربية</option>
+</select>
+</div>
+
+<h2>TeleBail-ga xush kelibsiz</h2>
+<p class="subtitle">Professional muloqot platformasi</p>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+
+<label class="label">Email pochta</label>
+<input type="text" id="loginEmail" placeholder="example@bail.com">
+
+<label class="label">Parol</label>
+<input type="password" id="loginPass" placeholder="******">
+
+<button onclick="login()">Kirish</button>
+
+<div class="link" onclick="showRegister()">Akkount yo'qmi? Ro'yxatdan o'tish</div>
+
+</div>
+
+<!-- REGISTER PAGE -->
+<div id="registerPage" class="hidden">
+
+<label class="label">Tug'ilgan sana</label>
+<input type="date" id="birth">
+
+<label class="label">Username</label>
+<input type="text" id="username" placeholder="example">
+
+<label class="label">Parol</label>
+<input type="password" id="regPass" placeholder="6+ harf va raqam">
+
+<button onclick="register()">Ro'yxatdan o'tish</button>
+
+<div class="link" onclick="showLogin()">Orqaga</div>
+
+</div>
+
+<div class="footer">
+© 2026 TeleBail Inc.
+</div>
+
+</div>
+
+<script>
+
+function showRegister(){
+loginPage.classList.add("hidden");
+registerPage.classList.remove("hidden");
+}
+
+function showLogin(){
+registerPage.classList.add("hidden");
+loginPage.classList.remove("hidden");
+}
+
+function register(){
+
+let birth=new Date(document.getElementById("birth").value);
+let age=new Date().getFullYear()-birth.getFullYear();
+
+if(age<16){
+alert("16 yoshdan kichik ro'yxatdan o'ta olmaydi");
+return;
+}
+
+let username=document.getElementById("username").value;
+let pass=document.getElementById("regPass").value;
+
+if(username.length<3){
+alert("Username kamida 3 harf");
+return;
+}
+
+if(pass.length<6 || !/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)){
+alert("Parol 6+ belgi, harf va raqam bo'lishi kerak");
+return;
+}
+
+let email=username+"@bail.com";
+
+localStorage.setItem("email",email);
+localStorage.setItem("pass",pass);
+
+alert("Ro'yxatdan o'tdingiz!");
+showLogin();
+}
+
+function login(){
+
+let email=document.getElementById("loginEmail").value;
+let pass=document.getElementById("loginPass").value;
+
+if(!email.endsWith("@bail.com")){
+alert("Faqat @bail.com ruxsat etiladi");
+return;
+}
+
+if(email!==localStorage.getItem("email") || pass!==localStorage.getItem("pass")){
+alert("Email yoki parol noto'g'ri");
+return;
+}
+
+alert("Muvaffaqiyatli kirdingiz!");
+}
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeleBail</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
 background:#1e1b4b; /* bir xil to'q ko'k */
 color:white;
 display:flex;
