@@ -239,3 +239,17 @@ messages.forEach((m,i)=>{
 let div=document.createElement("div");
 div.className="msg self";
 div.innerHTML=m+' <span class="delete" onclick="deleteMsg('+i+')">✖</span>';
+container.appendChild(div);
+});
+}
+
+function deleteMsg(i){
+let messages=JSON.parse(localStorage.getItem("telebail"))||[];
+messages.splice(i,1);
+localStorage.setItem("telebail",JSON.stringify(messages));
+loadMessages();
+}
+</script>
+
+</body>
+</html>
