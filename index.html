@@ -1,112 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeleBail</title>
-
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#0f172a;
-  color:white;
+margin:0;
+font-family:Arial, sans-serif;
+background:linear-gradient(180deg,#5b0000,#000814);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-.header{
-  background:#17212b;
-  padding:15px;
-  font-size:20px;
-  font-weight:bold;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.card{
+background:rgba(0,0,0,0.6);
+padding:30px;
+border-radius:15px;
+width:90%;
+max-width:400px;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
 }
 
-.search{
-  padding:10px;
-  background:#111b24;
+h1{text-align:center;}
+
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+border:none;
+background:#111;
+color:white;
 }
 
-.search input{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:#1e293b;
-  color:white;
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+background:linear-gradient(90deg,red,blue);
+color:white;
+font-size:16px;
+cursor:pointer;
 }
 
 .chat{
-  display:flex;
-  align-items:center;
-  padding:15px;
-  border-bottom:1px solid #1f2937;
-  cursor:pointer;
-  transition:0.2s;
+display:none;
+flex-direction:column;
+height:100vh;
 }
 
-.chat:hover{
-  background:#1e293b;
+.chat-header{
+background:#7b0000;
+padding:15px;
+text-align:center;
+font-weight:bold;
 }
 
-.avatar{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  margin-right:12px;
+.messages{
+flex:1;
+padding:10px;
+overflow-y:auto;
 }
 
-.name{
-  font-weight:bold;
+.msg{
+background:#222;
+padding:8px;
+margin:5px 0;
+border-radius:6px;
+position:relative;
 }
 
-.message{
-  font-size:13px;
-  color:gray;
+.msg button{
+position:absolute;
+right:5px;
+top:5px;
+background:red;
+font-size:10px;
+padding:3px 6px;
 }
 
-.badge{
-  background:red;
-  padding:3px 7px;
-  border-radius:12px;
-  font-size:12px;
-  margin-left:auto;
+.send{
+display:flex;
 }
 
+.send input{
+flex:1;
+}
+
+.hidden{display:none;}
 </style>
 </head>
-
 <body>
 
-<div class="header">
-  TeleBail
-  <span>🔍</span>
+<div class="card" id="login">
+<h1>TeleBail</h1>
+<input type="email" placeholder="example@gmail.com" id="email">
+<button onclick="sendCode()">Kod yuborish</button>
 </div>
 
-<div class="search">
-  <input type="text" placeholder="Search">
+<div class="card hidden" id="verify">
+<h1>Tasdiqlash kodi</h1>
+<p id="showCode"></p>
+<input type="text" placeholder="6 xonali kod" id="code">
+<button onclick="verifyCode()">Kirish</button>
 </div>
 
-<div class="chat" onclick="openChat('BailPro Bot')">
-  <div class="avatar" style="background:#2563eb;"></div>
-  <div>
-    <div class="name">BailPro Bot</div>
-    <div class="message">Appeal system active...</div>
-  </div>
-  <div class="badge">1</div>
+<div class="card hidden" id="profile">
+<h1>Profil to‘ldirish</h1>
+<input type="text" placeholder="Ism" id="name">
+<input type="text" placeholder="Familiya" id="surname">
+<input type="file" id="photo">
+<button onclick="enterChat()">Saqlash</button>
 </div>
 
-<div class="chat" onclick="openChat('Spam Report')">
-  <div class="avatar" style="background:red;"></div>
-  <div>
-    <div class="name">Spam Report</div>
-    <div class="message">Last report sent</div>
-  </div>
+<div class="chat" id="chat">
+<div class="chat-header">TeleBail Chat</div>
+<div class="messages" id="messages"></div>
+<div class="send">
+<input type="text" id="msgInput" placeholder="Xabar yozing...">
+<button onclick="sendMsg()">Yuborish</button>
+</div>
 </div>
 
 <script>
-function openChat(name){
-  alert(name + " chat opened");
+let generatedCode="";
+
+function sendCode(){
+let email=document.getElementById("email").value;
+if(!email)return alert("Email kiriting");
+generatedCode=Math.floor(100000+Math.random()*900000);
+document.getElementById("showCode").innerText=
+"Sizning kodingiz: "+generatedCode;
+document.getElementById("login").classList.add("hidden");
+document.getElementById("verify").classList.remove("hidden");
+}
+
+function verifyCode(){
+let code=document.getElementById("code").value;
+if(code==generatedCode){
+document.getElementById("verify").classList.add("hidden");
+document.getElementById("profile").classList.remove("hidden");
+}else{
+alert("Kod noto‘g‘ri");
+}
+}
+
+function enterChat(){
+document.getElementById("profile").classList.add("hidden");
+document.getElementById("chat").style.display="flex";
+}
+
+function sendMsg(){
+let text=document.getElementById("msgInput").value;
+if(!text)return;
+let msg=document.createElement("div");
+msg.className="msg";
+msg.innerHTML=text+" <button onclick='this.parentElement.remove()'>X</button>";
+document.getElementById("messages").appendChild(msg);
+document.getElementById("msgInput").value="";
+setTimeout(()=>{msg.remove()},10000);
 }
 </script>
 
