@@ -3,128 +3,119 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TeleBail</title>
+
 <style>
 body{
 margin:0;
 font-family:Arial;
-background:#f5f5f5;
+background:#0f0f0f;
+color:white;
+}
+
+#loginPage{
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
 }
-.box{
-width:340px;
-background:white;
-padding:30px;
+
+.loginBox{
+width:90%;
+max-width:350px;
+background:#1c1c1c;
+padding:25px;
 border-radius:15px;
-box-shadow:0 5px 20px rgba(0,0,0,0.1);
+box-shadow:0 0 20px rgba(0,0,0,0.6);
 text-align:center;
 }
+
 h2{
 color:#2AABEE;
-margin-bottom:20px;
 }
+
 input{
 width:100%;
 padding:12px;
 margin:10px 0;
-border-radius:10px;
-border:1px solid #ddd;
+border-radius:8px;
+border:none;
+background:#2b2b2b;
+color:white;
 font-size:16px;
 }
+
 button{
 width:100%;
 padding:12px;
 border:none;
-border-radius:10px;
+border-radius:8px;
 background:#2AABEE;
 color:white;
 font-size:16px;
 cursor:pointer;
 }
-button:hover{
-background:#1d96d1;
-}
-</style>
-</head>
-<body>
 
-<div class="box">
-<h2>TeleBail</h2>
-<input type="text" id="user" placeholder="Telefon raqam">
-<input type="password" id="pass" placeholder="Parol">
-<button onclick="login()">Kirish</button>
-</div>
-
-<script>
-function login(){
-let u=document.getElementById("user").value;
-let p=document.getElementById("pass").value;
-
-if(u.length<5 || p.length<5){
-alert("Login noto‘g‘ri!");
-return;
+#chatPage{
+display:none;
 }
 
-window.location="chat.html";
-}
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TeleBail</title>
-<style>
-body{
-margin:0;
-font-family:Arial;
-background:#f5f5f5;
-}
-.top{
-background:#2AABEE;
-color:white;
+.topbar{
+background:#1f1f1f;
 padding:15px;
 font-size:20px;
+border-bottom:1px solid #333;
 }
+
 .chat{
-background:white;
-padding:15px;
-border-bottom:1px solid #eee;
 display:flex;
 align-items:center;
-cursor:pointer;
+padding:15px;
+border-bottom:1px solid #222;
 }
+
 .avatar{
 width:45px;
 height:45px;
 border-radius:50%;
-background:#2AABEE;
-color:white;
 display:flex;
 align-items:center;
 justify-content:center;
 font-weight:bold;
 margin-right:15px;
 }
+
+.blue{ background:#2AABEE; }
+.yellow{ background:#f1c40f; color:black; }
+
 .name{
 font-weight:bold;
 }
+
 .last{
 color:gray;
 font-size:14px;
 }
 </style>
 </head>
+
 <body>
 
-<div class="top">TeleBail</div>
+<!-- LOGIN -->
+<div id="loginPage">
+<div class="loginBox">
+<h2>TeleBail</h2>
+<input type="text" id="user" placeholder="Telefon raqam">
+<input type="password" id="pass" placeholder="Parol">
+<button onclick="login()">Kirish</button>
+</div>
+</div>
+
+<!-- CHAT -->
+<div id="chatPage">
+<div class="topbar">TeleBail</div>
 
 <div class="chat">
-<div class="avatar">T</div>
+<div class="avatar blue">T</div>
 <div>
 <div class="name">TeleBail Rasmiy</div>
 <div class="last">Xush kelibsiz!</div>
@@ -132,18 +123,32 @@ font-size:14px;
 </div>
 
 <div class="chat">
-<div class="avatar" style="background:#ffcc00;color:black;">A</div>
+<div class="avatar yellow">A</div>
 <div>
 <div class="name">AntiBail Bot</div>
-<div class="last">Siz tizimga muvaffaqiyatli kirdingiz</div>
+<div class="last" id="botText">...</div>
 </div>
 </div>
 
+</div>
+
 <script>
-// AntiBail bot avtomatik yozish effekti
+function login(){
+let u=document.getElementById("user").value;
+let p=document.getElementById("pass").value;
+
+if(u.length<4 || p.length<4){
+alert("Login noto‘g‘ri!");
+return;
+}
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("chatPage").style.display="block";
+
 setTimeout(function(){
-alert("AntiBail Bot: Hisobingiz himoyalangan ✅");
-},2000);
+document.getElementById("botText").innerHTML="Siz tizimga muvaffaqiyatli kirdingiz ✅";
+},1500);
+}
 </script>
 
 </body>
