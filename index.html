@@ -9,57 +9,44 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:#0f1b3d;
+background:#0b1f4b;
 color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
-
-.container{
-width:90%;
-max-width:400px;
 }
 
 .top{
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:30px;
-}
-
-.logo{
-display:flex;
-align-items:center;
-gap:10px;
+padding:20px;
 font-size:20px;
 font-weight:bold;
 }
 
-.logo img{
-width:35px;
-height:35px;
-border-radius:8px;
-}
-
 select{
-background:#1c2a5c;
-border:none;
+background:#142d6b;
 color:white;
-padding:5px;
+border:none;
+padding:6px 10px;
 border-radius:6px;
 }
 
+.container{
+display:flex;
+justify-content:center;
+margin-top:60px;
+}
+
 .card{
-background:#162452;
-padding:25px;
+width:90%;
+max-width:400px;
+background:#142d6b;
+padding:30px;
 border-radius:15px;
 }
 
 h2{
 text-align:center;
-margin-bottom:20px;
+margin-bottom:25px;
 }
 
 label{
@@ -72,7 +59,7 @@ padding:12px;
 margin:5px 0 15px 0;
 border:none;
 border-radius:8px;
-background:#1c2a5c;
+background:#1c3c88;
 color:white;
 }
 
@@ -91,81 +78,66 @@ cursor:pointer;
 text-align:center;
 margin-top:15px;
 cursor:pointer;
-color:#aaa;
+color:#cbd5e1;
 }
 
 .hidden{
 display:none;
-}
-
-.home{
-text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<!-- TOP -->
 <div class="top">
-<div class="logo">
-<img src="https://cdn-icons-png.flaticon.com/512/9068/9068675.png">
-<span>TeleBail</span>
-</div>
+<div>TeleBail</div>
 
-<select>
-<option>O'zbek</option>
-<option>English</option>
+<select onchange="changeLang(this.value)">
+<option value="uz">O'zbek</option>
+<option value="en">English</option>
 </select>
 </div>
+
+<div class="container">
 
 <!-- LOGIN -->
 <div class="card" id="login">
 
-<h2>Kirish</h2>
+<h2 id="loginTitle">Kirish</h2>
 
-<label>Email pochta</label>
+<label id="emailLabel">Email pochta</label>
 <input type="email" placeholder="example@bail.com">
 
-<label>Parol</label>
+<label id="passLabel">Parol</label>
 <input type="password" placeholder="******">
 
-<button onclick="enter()">Kirish</button>
+<button id="loginBtn" onclick="enter()">Kirish</button>
 
-<div class="link" onclick="openRegister()">Ro'yxatdan o'tish</div>
+<div class="link" id="goRegister" onclick="openRegister()">Ro'yxatdan o'tish</div>
 
 </div>
 
 <!-- REGISTER -->
 <div class="card hidden" id="register">
 
-<h2>Ro'yxatdan o'tish</h2>
+<h2 id="regTitle">Ro'yxatdan o'tish</h2>
 
-<label>Ism</label>
+<label id="nameLabel">Ism</label>
 <input type="text">
 
-<label>Tug'ilgan sana</label>
+<label id="birthLabel">Tug'ilgan sana</label>
 <input type="date">
 
-<label>Username</label>
+<label id="userLabel">Username</label>
 <input type="text">
 
 <label>Parol</label>
 <input type="password">
 
-<button onclick="createAccount()">Ro'yxatdan o'tish</button>
+<button id="regBtn" onclick="createAccount()">Ro'yxatdan o'tish</button>
 
-<div class="link" onclick="backLogin()">Orqaga</div>
+<div class="link" id="backBtn" onclick="backLogin()">Orqaga</div>
 
-</div>
-
-<!-- HOME -->
-<div class="card hidden home" id="home">
-<h2>Xush kelibsiz!</h2>
-<p>Siz akkauntga kirdingiz.</p>
-<button onclick="logout()">Chiqish</button>
 </div>
 
 </div>
@@ -183,18 +155,47 @@ document.getElementById("login").classList.remove("hidden");
 }
 
 function createAccount(){
-document.getElementById("register").classList.add("hidden");
-document.getElementById("home").classList.remove("hidden");
+alert("Akkaunt yaratildi!");
 }
 
 function enter(){
-document.getElementById("login").classList.add("hidden");
-document.getElementById("home").classList.remove("hidden");
+alert("Kirish muvaffaqiyatli!");
 }
 
-function logout(){
-document.getElementById("home").classList.add("hidden");
-document.getElementById("login").classList.remove("hidden");
+function changeLang(lang){
+
+if(lang === "en"){
+
+document.getElementById("loginTitle").innerText="Login";
+document.getElementById("emailLabel").innerText="Email";
+document.getElementById("passLabel").innerText="Password";
+document.getElementById("loginBtn").innerText="Login";
+document.getElementById("goRegister").innerText="Register";
+
+document.getElementById("regTitle").innerText="Register";
+document.getElementById("nameLabel").innerText="Name";
+document.getElementById("birthLabel").innerText="Date of birth";
+document.getElementById("userLabel").innerText="Username";
+document.getElementById("regBtn").innerText="Register";
+document.getElementById("backBtn").innerText="Back";
+
+}else{
+
+document.getElementById("loginTitle").innerText="Kirish";
+document.getElementById("emailLabel").innerText="Email pochta";
+document.getElementById("passLabel").innerText="Parol";
+document.getElementById("loginBtn").innerText="Kirish";
+document.getElementById("goRegister").innerText="Ro'yxatdan o'tish";
+
+document.getElementById("regTitle").innerText="Ro'yxatdan o'tish";
+document.getElementById("nameLabel").innerText="Ism";
+document.getElementById("birthLabel").innerText="Tug'ilgan sana";
+document.getElementById("userLabel").innerText="Username";
+document.getElementById("regBtn").innerText="Ro'yxatdan o'tish";
+document.getElementById("backBtn").innerText="Orqaga";
+
+}
+
 }
 
 </script>
