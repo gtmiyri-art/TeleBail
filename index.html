@@ -15,9 +15,10 @@ body{
     align-items:center;
     height:100vh;
     overflow:hidden;
+    position:relative;
 }
 
-/* Red + Blue Glow */
+/* Red Glow */
 body::before{
     content:"";
     position:absolute;
@@ -30,6 +31,7 @@ body::before{
     opacity:0.3;
 }
 
+/* Blue Glow */
 body::after{
     content:"";
     position:absolute;
@@ -42,17 +44,17 @@ body::after{
     opacity:0.3;
 }
 
-/* Main Card */
 .container{
     width:380px;
-    height:650px;
+    height:700px;
     background:#161622;
-    border-radius:20px;
+    border-radius:25px;
     padding:15px;
     box-shadow:0 0 30px rgba(0,0,0,0.6);
     display:flex;
     flex-direction:column;
     z-index:2;
+    position:relative;
 }
 
 /* Header */
@@ -69,33 +71,18 @@ body::after{
     margin:0;
 }
 
-.icons{
-    display:flex;
-    gap:10px;
-}
-
-.icon{
-    width:30px;
-    height:30px;
-    background:#1f1f2e;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    cursor:pointer;
-}
-
 /* Chat List */
 .chat-list{
     flex:1;
     overflow-y:auto;
+    padding-bottom:70px;
 }
 
 .chat{
     display:flex;
     align-items:center;
     padding:8px;
-    border-radius:12px;
+    border-radius:14px;
     margin-bottom:6px;
     transition:0.3s;
 }
@@ -139,6 +126,35 @@ body::after{
     font-size:11px;
     color:#777;
 }
+
+/* Bottom Nav */
+.bottom-nav{
+    position:absolute;
+    bottom:15px;
+    left:15px;
+    right:15px;
+    height:55px;
+    background:rgba(30,30,45,0.6);
+    backdrop-filter:blur(10px);
+    border-radius:20px;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+}
+
+.nav-item{
+    color:#aaa;
+    font-size:12px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.nav-item.active{
+    color:white;
+    background:linear-gradient(45deg, red, blue);
+    padding:6px 12px;
+    border-radius:15px;
+}
 </style>
 </head>
 <body>
@@ -147,15 +163,10 @@ body::after{
 
     <div class="header">
         <h2>TeleBail Messages</h2>
-        <div class="icons">
-            <div class="icon">🔍</div>
-            <div class="icon">⚙️</div>
-        </div>
     </div>
 
     <div class="chat-list">
 
-        <!-- 10 Chats -->
         <div class="chat">
             <div class="avatar">
                 <img src="https://i.pravatar.cc/150?img=1">
@@ -189,7 +200,6 @@ body::after{
             <div class="time">10:05</div>
         </div>
 
-        <!-- 7 ta oddiy chat -->
         <script>
             for(let i=4;i<=10;i++){
                 document.write(`
@@ -201,12 +211,19 @@ body::after{
                         <h4>User ${i}</h4>
                         <p>Last message preview...</p>
                     </div>
-                    <div class="time">09:1${i}</div>
+                    <div class="time">09:${10+i}</div>
                 </div>
                 `);
             }
         </script>
 
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active">Chatlar</div>
+        <div class="nav-item">Kontaktlar</div>
+        <div class="nav-item">Botlar</div>
+        <div class="nav-item">Profil</div>
     </div>
 
 </div>
