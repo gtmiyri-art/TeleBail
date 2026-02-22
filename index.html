@@ -24,6 +24,7 @@ background:rgba(255,255,255,0.05);
 padding:25px;
 border-radius:20px;
 backdrop-filter:blur(15px);
+position:relative;
 }
 
 .top{
@@ -112,6 +113,8 @@ margin-top:20px;
 font-size:12px;
 opacity:0.5;
 }
+
+.hidden{display:none;}
 </style>
 </head>
 <body>
@@ -136,7 +139,8 @@ TeleBail
 <h2>TeleBail-ga xush kelibsiz</h2>
 <p class="subtitle">Professional muloqot platformasi</p>
 
-<!-- LOGIN -->
+<!-- LOGIN PAGE -->
+<div id="loginPage">
 
 <label class="label">Email pochta</label>
 <input type="text" id="loginEmail" placeholder="example@bail.com">
@@ -146,7 +150,27 @@ TeleBail
 
 <button onclick="login()">Kirish</button>
 
-<div class="link">Akkount yo'qmi? Ro'yxatdan o'tish</div>
+<div class="link" onclick="showRegister()">Akkount yo'qmi? Ro'yxatdan o'tish</div>
+
+</div>
+
+<!-- REGISTER PAGE -->
+<div id="registerPage" class="hidden">
+
+<label class="label">Tug'ilgan sana</label>
+<input type="date" id="birth">
+
+<label class="label">Username</label>
+<input type="text" id="username" placeholder="example">
+
+<label class="label">Parol</label>
+<input type="password" id="regPass" placeholder="6+ harf va raqam">
+
+<button onclick="register()">Ro'yxatdan o'tish</button>
+
+<div class="link" onclick="showLogin()">Orqaga</div>
+
+</div>
 
 <div class="footer">
 © 2026 TeleBail Inc.
@@ -155,7 +179,51 @@ TeleBail
 </div>
 
 <script>
+
+function showRegister(){
+loginPage.classList.add("hidden");
+registerPage.classList.remove("hidden");
+}
+
+function showLogin(){
+registerPage.classList.add("hidden");
+loginPage.classList.remove("hidden");
+}
+
+function register(){
+
+let birth=new Date(document.getElementById("birth").value);
+let age=new Date().getFullYear()-birth.getFullYear();
+
+if(age<16){
+alert("16 yoshdan kichik ro'yxatdan o'ta olmaydi");
+return;
+}
+
+let username=document.getElementById("username").value;
+let pass=document.getElementById("regPass").value;
+
+if(username.length<3){
+alert("Username kamida 3 harf");
+return;
+}
+
+if(pass.length<6 || !/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)){
+alert("Parol 6+ belgi, harf va raqam bo'lishi kerak");
+return;
+}
+
+let email=username+"@bail.com";
+
+localStorage.setItem("email",email);
+localStorage.setItem("pass",pass);
+
+alert("Ro'yxatdan o'tdingiz!");
+showLogin();
+}
+
 function login(){
+
 let email=document.getElementById("loginEmail").value;
 let pass=document.getElementById("loginPass").value;
 
@@ -164,8 +232,14 @@ alert("Faqat @bail.com ruxsat etiladi");
 return;
 }
 
-alert("Tekshirildi (demo)");
+if(email!==localStorage.getItem("email") || pass!==localStorage.getItem("pass")){
+alert("Email yoki parol noto'g'ri");
+return;
 }
+
+alert("Muvaffaqiyatli kirdingiz!");
+}
+
 </script>
 
 </body>
