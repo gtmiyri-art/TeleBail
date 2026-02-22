@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeleBail</title>
+
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(180deg,#5b0000,#000814);
+font-family:Arial;
+background:linear-gradient(180deg,#6b0000,#000814);
 color:white;
 display:flex;
 justify-content:center;
@@ -19,30 +20,38 @@ height:100vh;
 .card{
 background:rgba(0,0,0,0.6);
 padding:30px;
-border-radius:15px;
+border-radius:18px;
 width:90%;
 max-width:400px;
-box-shadow:0 0 20px rgba(0,0,0,0.6);
+box-shadow:0 0 25px rgba(0,0,0,0.6);
 }
 
-h1{text-align:center;}
+h1{
+margin-bottom:5px;
+}
+
+p{
+opacity:0.7;
+font-size:14px;
+}
 
 input{
 width:100%;
-padding:12px;
-margin:10px 0;
-border-radius:8px;
+padding:14px;
+margin:12px 0;
+border-radius:10px;
 border:none;
 background:#111;
 color:white;
+font-size:14px;
 }
 
 button{
 width:100%;
-padding:12px;
+padding:14px;
 border:none;
-border-radius:8px;
-background:linear-gradient(90deg,red,blue);
+border-radius:10px;
+background:linear-gradient(90deg,#ff0000,#4a6bff);
 color:white;
 font-size:16px;
 cursor:pointer;
@@ -52,11 +61,12 @@ cursor:pointer;
 display:none;
 flex-direction:column;
 height:100vh;
+width:100%;
 }
 
 .chat-header{
 background:#7b0000;
-padding:15px;
+padding:18px;
 text-align:center;
 font-weight:bold;
 }
@@ -68,54 +78,47 @@ overflow-y:auto;
 }
 
 .msg{
-background:#222;
-padding:8px;
-margin:5px 0;
-border-radius:6px;
+background:#1e1e1e;
+padding:10px;
+margin:8px 0;
+border-radius:8px;
 position:relative;
 }
 
-.msg button{
+.delete{
 position:absolute;
-right:5px;
+right:8px;
 top:5px;
-background:red;
-font-size:10px;
-padding:3px 6px;
+font-size:12px;
+cursor:pointer;
+color:red;
 }
 
 .send{
 display:flex;
+padding:10px;
+background:#000814;
 }
 
 .send input{
 flex:1;
+margin:0;
 }
 
-.hidden{display:none;}
+.send button{
+width:auto;
+margin-left:10px;
+}
 </style>
 </head>
 <body>
 
 <div class="card" id="login">
-<h1>TeleBail</h1>
+<h1>TeleBail-ga xush kelibsiz</h1>
+<p>Professional muloqot platformasi</p>
 <input type="email" placeholder="example@gmail.com" id="email">
-<button onclick="sendCode()">Kod yuborish</button>
-</div>
-
-<div class="card hidden" id="verify">
-<h1>Tasdiqlash kodi</h1>
-<p id="showCode"></p>
-<input type="text" placeholder="6 xonali kod" id="code">
-<button onclick="verifyCode()">Kirish</button>
-</div>
-
-<div class="card hidden" id="profile">
-<h1>Profil to‘ldirish</h1>
-<input type="text" placeholder="Ism" id="name">
-<input type="text" placeholder="Familiya" id="surname">
-<input type="file" id="photo">
-<button onclick="enterChat()">Saqlash</button>
+<input type="password" placeholder="Parol">
+<button onclick="enter()">Kirish</button>
 </div>
 
 <div class="chat" id="chat">
@@ -128,42 +131,44 @@ flex:1;
 </div>
 
 <script>
-let generatedCode="";
-
-function sendCode(){
+function enter(){
 let email=document.getElementById("email").value;
-if(!email)return alert("Email kiriting");
-generatedCode=Math.floor(100000+Math.random()*900000);
-document.getElementById("showCode").innerText=
-"Sizning kodingiz: "+generatedCode;
-document.getElementById("login").classList.add("hidden");
-document.getElementById("verify").classList.remove("hidden");
-}
-
-function verifyCode(){
-let code=document.getElementById("code").value;
-if(code==generatedCode){
-document.getElementById("verify").classList.add("hidden");
-document.getElementById("profile").classList.remove("hidden");
-}else{
-alert("Kod noto‘g‘ri");
-}
-}
-
-function enterChat(){
-document.getElementById("profile").classList.add("hidden");
+if(!email){alert("Email kiriting");return;}
+document.getElementById("login").style.display="none";
 document.getElementById("chat").style.display="flex";
+loadMessages();
 }
 
 function sendMsg(){
 let text=document.getElementById("msgInput").value;
 if(!text)return;
-let msg=document.createElement("div");
-msg.className="msg";
-msg.innerHTML=text+" <button onclick='this.parentElement.remove()'>X</button>";
-document.getElementById("messages").appendChild(msg);
+
+let messages=JSON.parse(localStorage.getItem("telebail"))||[];
+messages.push(text);
+localStorage.setItem("telebail",JSON.stringify(messages));
+
 document.getElementById("msgInput").value="";
-setTimeout(()=>{msg.remove()},10000);
+loadMessages();
+}
+
+function loadMessages(){
+let container=document.getElementById("messages");
+container.innerHTML="";
+let messages=JSON.parse(localStorage.getItem("telebail"))||[];
+
+messages.forEach((m,i)=>{
+let div=document.createElement("div");
+div.className="msg";
+div.innerHTML=m+' <span class="delete" onclick="deleteMsg('+i+')">✖</span>';
+container.appendChild(div);
+});
+}
+
+function deleteMsg(index){
+let messages=JSON.parse(localStorage.getItem("telebail"))||[];
+messages.splice(index,1);
+localStorage.setItem("telebail",JSON.stringify(messages));
+loadMessages();
 }
 </script>
 
