@@ -9,57 +9,73 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:#0b1f4b;
+background:linear-gradient(to bottom,#1e1b4b,#312e81);
 color:white;
 }
 
-.top{
+/* TOP BAR */
+.topbar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px;
+padding:15px 20px;
+box-sizing:border-box;
+z-index:1000;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
 font-size:20px;
 font-weight:bold;
 }
 
+.logo img{
+width:35px;
+height:35px;
+border-radius:10px;
+}
+
 select{
-background:#142d6b;
+background:#4338ca;
 color:white;
 border:none;
 padding:6px 10px;
-border-radius:6px;
+border-radius:8px;
 }
 
+/* CARD */
 .container{
+margin-top:120px;
 display:flex;
 justify-content:center;
-margin-top:60px;
 }
 
 .card{
 width:90%;
 max-width:400px;
-background:#142d6b;
+background:rgba(255,255,255,0.05);
 padding:30px;
-border-radius:15px;
+border-radius:20px;
+backdrop-filter:blur(10px);
 }
 
 h2{
 text-align:center;
-margin-bottom:25px;
-}
-
-label{
-font-size:14px;
 }
 
 input{
 width:100%;
 padding:12px;
-margin:5px 0 15px 0;
+margin:8px 0 18px 0;
 border:none;
-border-radius:8px;
-background:#1c3c88;
+border-radius:10px;
+background:rgba(255,255,255,0.08);
 color:white;
 }
 
@@ -67,8 +83,8 @@ button{
 width:100%;
 padding:12px;
 border:none;
-border-radius:8px;
-background:#2563eb;
+border-radius:10px;
+background:linear-gradient(to right,#ef4444,#6366f1);
 color:white;
 font-size:16px;
 cursor:pointer;
@@ -78,23 +94,28 @@ cursor:pointer;
 text-align:center;
 margin-top:15px;
 cursor:pointer;
-color:#cbd5e1;
+color:#ddd;
 }
 
-.hidden{
-display:none;
-}
+.hidden{display:none;}
 </style>
 </head>
 
 <body>
 
-<div class="top">
-<div>TeleBail</div>
+<!-- TOP -->
+<div class="topbar">
+<div class="logo">
+<img src="https://cdn-icons-png.flaticon.com/512/9068/9068675.png">
+<span>TeleBail</span>
+</div>
 
 <select onchange="changeLang(this.value)">
 <option value="uz">O'zbek</option>
 <option value="en">English</option>
+<option value="ru">Русский</option>
+<option value="tr">Türkçe</option>
+<option value="ar">العربية</option>
 </select>
 </div>
 
@@ -102,98 +123,106 @@ display:none;
 
 <!-- LOGIN -->
 <div class="card" id="login">
+<h2 id="title">TeleBail-ga xush kelibsiz</h2>
 
-<h2 id="loginTitle">Kirish</h2>
-
-<label id="emailLabel">Email pochta</label>
+<label id="emailText">Email pochta</label>
 <input type="email" placeholder="example@bail.com">
 
-<label id="passLabel">Parol</label>
-<input type="password" placeholder="******">
-
-<button id="loginBtn" onclick="enter()">Kirish</button>
-
-<div class="link" id="goRegister" onclick="openRegister()">Ro'yxatdan o'tish</div>
-
-</div>
-
-<!-- REGISTER -->
-<div class="card hidden" id="register">
-
-<h2 id="regTitle">Ro'yxatdan o'tish</h2>
-
-<label id="nameLabel">Ism</label>
-<input type="text">
-
-<label id="birthLabel">Tug'ilgan sana</label>
-<input type="date">
-
-<label id="userLabel">Username</label>
-<input type="text">
-
-<label>Parol</label>
+<label id="passText">Parol</label>
 <input type="password">
 
-<button id="regBtn" onclick="createAccount()">Ro'yxatdan o'tish</button>
+<button id="loginBtn">Kirish</button>
 
-<div class="link" id="backBtn" onclick="backLogin()">Orqaga</div>
+<div class="link" onclick="step1()">Ro'yxatdan o'tish</div>
+</div>
 
+<!-- REGISTER STEP 1 -->
+<div class="card hidden" id="step1">
+<h2>Ism kiriting</h2>
+<input type="text">
+<button onclick="step2()">Keyingi</button>
+</div>
+
+<!-- REGISTER STEP 2 -->
+<div class="card hidden" id="step2">
+<h2>Tug'ilgan sana</h2>
+<input type="date">
+<button onclick="step3()">Keyingi</button>
+</div>
+
+<!-- REGISTER STEP 3 -->
+<div class="card hidden" id="step3">
+<h2>Username</h2>
+<input type="text">
+<button onclick="step4()">Keyingi</button>
+</div>
+
+<!-- REGISTER STEP 4 -->
+<div class="card hidden" id="step4">
+<h2>Parol yarating</h2>
+<input type="password">
+<button onclick="finish()">Tugatish</button>
 </div>
 
 </div>
 
 <script>
 
-function openRegister(){
+function step1(){
 document.getElementById("login").classList.add("hidden");
-document.getElementById("register").classList.remove("hidden");
+document.getElementById("step1").classList.remove("hidden");
 }
-
-function backLogin(){
-document.getElementById("register").classList.add("hidden");
-document.getElementById("login").classList.remove("hidden");
+function step2(){
+document.getElementById("step1").classList.add("hidden");
+document.getElementById("step2").classList.remove("hidden");
 }
-
-function createAccount(){
-alert("Akkaunt yaratildi!");
+function step3(){
+document.getElementById("step2").classList.add("hidden");
+document.getElementById("step3").classList.remove("hidden");
 }
-
-function enter(){
-alert("Kirish muvaffaqiyatli!");
+function step4(){
+document.getElementById("step3").classList.add("hidden");
+document.getElementById("step4").classList.remove("hidden");
+}
+function finish(){
+alert("Account yaratildi!");
 }
 
 function changeLang(lang){
 
-if(lang === "en"){
+if(lang==="en"){
+title.innerText="Welcome to TeleBail";
+emailText.innerText="Email";
+passText.innerText="Password";
+loginBtn.innerText="Login";
+}
 
-document.getElementById("loginTitle").innerText="Login";
-document.getElementById("emailLabel").innerText="Email";
-document.getElementById("passLabel").innerText="Password";
-document.getElementById("loginBtn").innerText="Login";
-document.getElementById("goRegister").innerText="Register";
+if(lang==="ru"){
+title.innerText="Добро пожаловать в TeleBail";
+emailText.innerText="Электронная почта";
+passText.innerText="Пароль";
+loginBtn.innerText="Войти";
+}
 
-document.getElementById("regTitle").innerText="Register";
-document.getElementById("nameLabel").innerText="Name";
-document.getElementById("birthLabel").innerText="Date of birth";
-document.getElementById("userLabel").innerText="Username";
-document.getElementById("regBtn").innerText="Register";
-document.getElementById("backBtn").innerText="Back";
+if(lang==="tr"){
+title.innerText="TeleBail'e hoş geldiniz";
+emailText.innerText="E-posta";
+passText.innerText="Şifre";
+loginBtn.innerText="Giriş";
+}
 
-}else{
+if(lang==="ar"){
+title.innerText="مرحبًا بك في TeleBail";
+emailText.innerText="البريد الإلكتروني";
+passText.innerText="كلمة المرور";
+loginBtn.innerText="تسجيل الدخول";
+}
 
-document.getElementById("loginTitle").innerText="Kirish";
-document.getElementById("emailLabel").innerText="Email pochta";
-document.getElementById("passLabel").innerText="Parol";
-document.getElementById("loginBtn").innerText="Kirish";
-document.getElementById("goRegister").innerText="Ro'yxatdan o'tish";
-
-document.getElementById("regTitle").innerText="Ro'yxatdan o'tish";
-document.getElementById("nameLabel").innerText="Ism";
-document.getElementById("birthLabel").innerText="Tug'ilgan sana";
-document.getElementById("userLabel").innerText="Username";
-document.getElementById("regBtn").innerText="Ro'yxatdan o'tish";
-document.getElementById("backBtn").innerText="Orqaga";
-
+if(lang==="uz"){
+title.innerText="TeleBail-ga xush kelibsiz";
+emailText.innerText="Email pochta";
+passText.innerText="Parol";
+loginBtn.innerText="Kirish";
 }
 
 }
