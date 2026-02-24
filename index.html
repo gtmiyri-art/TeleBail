@@ -1,200 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleBail</title>
+<title>TeleBail Test</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial;
-background:#0f0f1a;
+font-family:Arial, sans-serif;
+background:#0f172a;
 color:white;
-overflow:hidden;
 }
-#splash{
-position:fixed;
-width:100%;
-height:100vh;
-background:black;
+
+/* Center */
+.center{
 display:flex;
+flex-direction:column;
 justify-content:center;
 align-items:center;
-font-size:28px;
-font-weight:bold;
+height:100vh;
 }
-.hidden{display:none;}
-.container{padding:20px;}
-button{
-padding:12px;
-margin:5px 0;
-width:100%;
-border:none;
-border-radius:8px;
-background:linear-gradient(45deg,#ff0040,#6a00ff);
-color:white;
-font-size:16px;
-}
+
+/* Input */
 input{
 padding:12px;
-width:100%;
-border-radius:8px;
 border:none;
-margin-bottom:10px;
+border-radius:8px;
+font-size:18px;
+text-align:center;
+margin-top:15px;
+width:200px;
 }
-.menu{
-position:fixed;
-top:0;
-right:-250px;
-width:250px;
+
+button{
+margin-top:15px;
+padding:10px 25px;
+border:none;
+border-radius:8px;
+background:#ff0066;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff3385;
+}
+
+/* Chat */
+#chatPage{
+display:none;
 height:100vh;
-background:#1b1b2e;
-transition:0.3s;
-padding:20px;
+background:#111827;
 }
-.menu.active{right:0;}
+
 .topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px;
-background:#141428;
-}
-.logo{cursor:pointer;}
-.counter{font-size:14px;color:#aaa;}
-.block{
-background:#300000;
-padding:20px;
-border-radius:10px;
+background:#1f2937;
+padding:15px;
+font-weight:bold;
 text-align:center;
 }
-.badge{
-color:gold;
+
+.chatBox{
+padding:15px;
+}
+
+.message{
+background:#374151;
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+max-width:80%;
+}
+
+.bot{
+background:#ff0066;
 }
 </style>
 </head>
-
 <body>
 
-<div id="splash">TeleBail</div>
-
-<div id="app" class="hidden">
-
-<div class="topbar">
-<div class="logo" onclick="logoTap()">TeleBail</div>
-<div onclick="toggleMenu()">☰</div>
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="center">
+<h2>6 xonali kod kiriting</h2>
+<input type="password" id="code" maxlength="6" placeholder="******">
+<button onclick="login()">Kirish</button>
+<p id="msg"></p>
 </div>
 
-<div class="menu" id="menu">
-<button onclick="showHome()">Home</button>
-<button onclick="showAnti()">AntiBail</button>
-<button onclick="togglePremium()">BailPro</button>
-<button onclick="logout()">Chiqish</button>
+<!-- CHAT PAGE -->
+<div id="chatPage">
+<div class="topbar">TeleBail Chat</div>
+
+<div class="chatBox">
+<div class="message">TeleBail Rasmiy: Xush kelibsiz 👋</div>
+<div class="message bot">AntiBail Bot: Hisobingiz faol ✅</div>
 </div>
-
-<div class="container" id="content"></div>
-
 </div>
 
 <script>
-let taps=0;
-let isPremium=false;
-let attempts=0;
+let attempts = 0;
 
-setTimeout(()=>{
-document.getElementById("splash").classList.add("hidden");
-document.getElementById("app").classList.remove("hidden");
-if(localStorage.getItem("logged")==="true"){
-showHome();
-}else{
-showLogin();
-}
-},2000);
+function login(){
+let code = document.getElementById("code").value;
+let msg = document.getElementById("msg");
 
-function showLogin(){
-document.getElementById("content").innerHTML=`
-<h2>Login</h2>
-<p>Demo kod: <b>123456</b></p>
-<input id="code" placeholder="6 xonali kod">
-<button onclick="checkLogin()">Kirish</button>
-<p id="error"></p>
-`;
-}
-
-function checkLogin(){
-let code=document.getElementById("code").value;
-if(localStorage.getItem("blocked")){
-alert("1 minut blok!");
+if(attempts >= 3){
+msg.innerHTML = "Siz bloklandingiz ❌";
+msg.style.color = "red";
 return;
 }
-if(code==="123456"){
-localStorage.setItem("logged","true");
-showHome();
+
+if(code === "123456"){
+document.getElementById("loginPage").style.display="none";
+document.getElementById("chatPage").style.display="block";
 }else{
 attempts++;
-if(attempts>=3){
-localStorage.setItem("blocked","true");
-setTimeout(()=>localStorage.removeItem("blocked"),60000);
-alert("3 xato! 1 minut blok");
-}
-document.getElementById("error").innerText="Xato kod!";
-}
-}
-
-function showHome(){
-document.getElementById("content").innerHTML=`
-<h2>Profil ${isPremium?'<span class="badge">👑 BailPro</span>':''}</h2>
-<p class="counter">Foydalanuvchilar: ${Math.floor(Math.random()*50000)+10000}</p>
-`;
-}
-
-function showAnti(){
-if(!isPremium){
-document.getElementById("content").innerHTML=`
-<div class="block">
-<h2>ACCOUNT TEMPORARY BLOCKED</h2>
-<p>3/3 ogohlantirish</p>
-<button onclick="appeal()">Appeal yuborish</button>
-</div>
-`;
-}else{
-document.getElementById("content").innerHTML=`
-<h2>👑 BailPro foydalanuvchi</h2>
-<p>Siz bloklanmaysiz.</p>
-`;
-}
-}
-
-function appeal(){
-window.open("https://t.me","_blank");
-}
-
-function toggleMenu(){
-document.getElementById("menu").classList.toggle("active");
-}
-
-function logout(){
-localStorage.removeItem("logged");
-location.reload();
-}
-
-function togglePremium(){
-isPremium=!isPremium;
-alert("Premium: "+isPremium);
-showHome();
-}
-
-function logoTap(){
-taps++;
-if(taps>=5){
-let pin=prompt("Admin PIN:");
-if(pin==="999999"){
-alert("Admin panel ochildi (demo)");
-}else{
-alert("Xato PIN");
-}
-taps=0;
+msg.innerHTML = "Kod noto‘g‘ri ("+attempts+"/3)";
+msg.style.color = "orange";
 }
 }
 </script>
