@@ -3,203 +3,200 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleBail 2.0</title>
+<title>TeleBail</title>
 
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-  color:white;
+margin:0;
+font-family:Arial;
+background:#0f0f1a;
+color:white;
+overflow:hidden;
 }
-
-/* HEADER */
-.header{
-  padding:15px;
-  font-size:20px;
-  font-weight:bold;
+#splash{
+position:fixed;
+width:100%;
+height:100vh;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:28px;
+font-weight:bold;
 }
-
-/* SEARCH */
-.search-box{
-  margin:10px;
+.hidden{display:none;}
+.container{padding:20px;}
+button{
+padding:12px;
+margin:5px 0;
+width:100%;
+border:none;
+border-radius:8px;
+background:linear-gradient(45deg,#ff0040,#6a00ff);
+color:white;
+font-size:16px;
 }
-
-.search-box input{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:20px;
-  outline:none;
-  background:rgba(255,255,255,0.1);
-  color:white;
+input{
+padding:12px;
+width:100%;
+border-radius:8px;
+border:none;
+margin-bottom:10px;
 }
-
-/* CHAT LIST */
-.chat-list{
-  padding:10px;
-  padding-bottom:120px;
+.menu{
+position:fixed;
+top:0;
+right:-250px;
+width:250px;
+height:100vh;
+background:#1b1b2e;
+transition:0.3s;
+padding:20px;
 }
-
-.chat{
-  display:flex;
-  align-items:center;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:15px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(10px);
-  cursor:pointer;
+.menu.active{right:0;}
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px;
+background:#141428;
 }
-
-.chat img{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  margin-right:10px;
+.logo{cursor:pointer;}
+.counter{font-size:14px;color:#aaa;}
+.block{
+background:#300000;
+padding:20px;
+border-radius:10px;
+text-align:center;
 }
-
-.chat-name{
-  font-weight:bold;
-}
-
-.chat-message{
-  font-size:13px;
-  opacity:0.7;
-}
-
-/* CHAT WINDOW */
-.chat-window{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:#111;
-  padding:15px;
-  box-sizing:border-box;
-}
-
-.chat-window h3{
-  margin-top:0;
-}
-
-.back-btn{
-  margin-bottom:10px;
-  cursor:pointer;
-  color:#ff4d6d;
-}
-
-/* BOTTOM NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:15px;
-  left:50%;
-  transform:translateX(-50%);
-  width:90%;
-  height:65px;
-  background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(20px);
-  border-radius:30px;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  box-shadow:0 0 20px rgba(255,0,80,0.4);
-}
-
-.nav-item{
-  font-size:22px;
-  opacity:0.6;
-  cursor:pointer;
-}
-
-.nav-item.active{
-  background:linear-gradient(45deg,#ff0057,#ff7b00);
-  padding:12px;
-  border-radius:50%;
-  opacity:1;
-  box-shadow:0 0 15px #ff0057;
-}
-
-.profile-img{
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  border:2px solid #ff0057;
+.badge{
+color:gold;
 }
 </style>
 </head>
+
 <body>
 
-<div class="header">TeleBail Messages</div>
+<div id="splash">TeleBail</div>
 
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search...">
+<div id="app" class="hidden">
+
+<div class="topbar">
+<div class="logo" onclick="logoTap()">TeleBail</div>
+<div onclick="toggleMenu()">☰</div>
 </div>
 
-<div class="chat-list" id="chatList">
-
-  <div class="chat" onclick="openChat('AntiBail Bot')">
-    <img src="https://i.pravatar.cc/150?img=12">
-    <div>
-      <div class="chat-name">AntiBail Bot</div>
-      <div class="chat-message">Rasmiy kod yuborildi</div>
-    </div>
-  </div>
-
-  <div class="chat" onclick="openChat('BailPro Support')">
-    <img src="https://i.pravatar.cc/150?img=32">
-    <div>
-      <div class="chat-name">BailPro Support</div>
-      <div class="chat-message">Appeal yuboring</div>
-    </div>
-  </div>
-
-  <div class="chat" onclick="openChat('TeleBail Admin')">
-    <img src="https://i.pravatar.cc/150?img=45">
-    <div>
-      <div class="chat-name">TeleBail Admin</div>
-      <div class="chat-message">Online</div>
-    </div>
-  </div>
-
+<div class="menu" id="menu">
+<button onclick="showHome()">Home</button>
+<button onclick="showAnti()">AntiBail</button>
+<button onclick="togglePremium()">BailPro</button>
+<button onclick="logout()">Chiqish</button>
 </div>
 
-<!-- CHAT WINDOW -->
-<div class="chat-window" id="chatWindow">
-  <div class="back-btn" onclick="closeChat()">⬅ Back</div>
-  <h3 id="chatTitle"></h3>
-  <p>Bu yerda chat yozish funksiyasi keyingi versiyada qo‘shiladi.</p>
-</div>
+<div class="container" id="content"></div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="nav-item active">💬</div>
-  <div class="nav-item">👤</div>
-  <div class="nav-item">⚙️</div>
-  <img src="https://i.pravatar.cc/150?img=5" class="profile-img">
 </div>
 
 <script>
-function openChat(name){
-  document.getElementById("chatTitle").innerText = name;
-  document.getElementById("chatWindow").style.display = "block";
+let taps=0;
+let isPremium=false;
+let attempts=0;
+
+setTimeout(()=>{
+document.getElementById("splash").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+if(localStorage.getItem("logged")==="true"){
+showHome();
+}else{
+showLogin();
+}
+},2000);
+
+function showLogin(){
+document.getElementById("content").innerHTML=`
+<h2>Login</h2>
+<p>Demo kod: <b>123456</b></p>
+<input id="code" placeholder="6 xonali kod">
+<button onclick="checkLogin()">Kirish</button>
+<p id="error"></p>
+`;
 }
 
-function closeChat(){
-  document.getElementById("chatWindow").style.display = "none";
+function checkLogin(){
+let code=document.getElementById("code").value;
+if(localStorage.getItem("blocked")){
+alert("1 minut blok!");
+return;
+}
+if(code==="123456"){
+localStorage.setItem("logged","true");
+showHome();
+}else{
+attempts++;
+if(attempts>=3){
+localStorage.setItem("blocked","true");
+setTimeout(()=>localStorage.removeItem("blocked"),60000);
+alert("3 xato! 1 minut blok");
+}
+document.getElementById("error").innerText="Xato kod!";
+}
 }
 
-document.getElementById("searchInput").addEventListener("keyup", function(){
-  let filter = this.value.toLowerCase();
-  let chats = document.getElementsByClassName("chat");
+function showHome(){
+document.getElementById("content").innerHTML=`
+<h2>Profil ${isPremium?'<span class="badge">👑 BailPro</span>':''}</h2>
+<p class="counter">Foydalanuvchilar: ${Math.floor(Math.random()*50000)+10000}</p>
+`;
+}
 
-  for(let i=0;i<chats.length;i++){
-    let name = chats[i].innerText.toLowerCase();
-    chats[i].style.display = name.includes(filter) ? "" : "none";
-  }
-});
+function showAnti(){
+if(!isPremium){
+document.getElementById("content").innerHTML=`
+<div class="block">
+<h2>ACCOUNT TEMPORARY BLOCKED</h2>
+<p>3/3 ogohlantirish</p>
+<button onclick="appeal()">Appeal yuborish</button>
+</div>
+`;
+}else{
+document.getElementById("content").innerHTML=`
+<h2>👑 BailPro foydalanuvchi</h2>
+<p>Siz bloklanmaysiz.</p>
+`;
+}
+}
+
+function appeal(){
+window.open("https://t.me","_blank");
+}
+
+function toggleMenu(){
+document.getElementById("menu").classList.toggle("active");
+}
+
+function logout(){
+localStorage.removeItem("logged");
+location.reload();
+}
+
+function togglePremium(){
+isPremium=!isPremium;
+alert("Premium: "+isPremium);
+showHome();
+}
+
+function logoTap(){
+taps++;
+if(taps>=5){
+let pin=prompt("Admin PIN:");
+if(pin==="999999"){
+alert("Admin panel ochildi (demo)");
+}else{
+alert("Xato PIN");
+}
+taps=0;
+}
+}
 </script>
 
 </body>
