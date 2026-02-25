@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleBail Test</title>
+<title>Bailgram</title>
 
 <style>
 body{
@@ -13,114 +13,121 @@ background:#0f172a;
 color:white;
 }
 
-/* Center */
-.center{
+/* LOGIN */
+#loginPage{
 display:flex;
-flex-direction:column;
+height:100vh;
 justify-content:center;
 align-items:center;
-height:100vh;
+flex-direction:column;
 }
 
-/* Input */
 input{
 padding:12px;
+width:220px;
 border:none;
 border-radius:8px;
-font-size:18px;
-text-align:center;
-margin-top:15px;
-width:200px;
+margin-bottom:10px;
 }
 
 button{
-margin-top:15px;
-padding:10px 25px;
+padding:12px 20px;
 border:none;
 border-radius:8px;
-background:#ff0066;
+background:#2563eb;
 color:white;
-font-size:16px;
 cursor:pointer;
 }
 
-button:hover{
-background:#ff3385;
-}
-
-/* Chat */
+/* CHAT PAGE */
 #chatPage{
 display:none;
 height:100vh;
-background:#111827;
+flex-direction:column;
 }
 
 .topbar{
-background:#1f2937;
+background:#1e293b;
 padding:15px;
-font-weight:bold;
 text-align:center;
+font-weight:bold;
 }
 
-.chatBox{
-padding:15px;
+.messages{
+flex:1;
+padding:10px;
+overflow-y:auto;
 }
 
 .message{
-background:#374151;
-padding:10px;
+background:#1e293b;
+padding:8px 12px;
 border-radius:10px;
-margin-bottom:10px;
-max-width:80%;
+margin-bottom:8px;
+max-width:70%;
 }
 
-.bot{
-background:#ff0066;
+.bottom{
+display:flex;
+padding:10px;
+background:#1e293b;
+}
+
+.bottom input{
+flex:1;
+margin:0;
+margin-right:10px;
 }
 </style>
 </head>
+
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage" class="center">
-<h2>6 xonali kod kiriting</h2>
-<input type="password" id="code" maxlength="6" placeholder="******">
+<div id="loginPage">
+<h2>Bailgram</h2>
+<input type="text" id="username" placeholder="Username kiriting">
 <button onclick="login()">Kirish</button>
-<p id="msg"></p>
 </div>
 
-<!-- CHAT PAGE -->
 <div id="chatPage">
-<div class="topbar">TeleBail Chat</div>
-
-<div class="chatBox">
-<div class="message">TeleBail Rasmiy: Xush kelibsiz 👋</div>
-<div class="message bot">AntiBail Bot: Hisobingiz faol ✅</div>
+<div class="topbar">Bailgram Chat</div>
+<div class="messages" id="messages"></div>
+<div class="bottom">
+<input type="text" id="msgInput" placeholder="Xabar yozing...">
+<button onclick="sendMessage()">Yuborish</button>
 </div>
 </div>
 
 <script>
-let attempts = 0;
 
 function login(){
-let code = document.getElementById("code").value;
-let msg = document.getElementById("msg");
+let username = document.getElementById("username").value;
+if(username.trim() === "") return alert("Username kiriting");
 
-if(attempts >= 3){
-msg.innerHTML = "Siz bloklandingiz ❌";
-msg.style.color = "red";
-return;
-}
+localStorage.setItem("user", username);
 
-if(code === "123456"){
 document.getElementById("loginPage").style.display="none";
-document.getElementById("chatPage").style.display="block";
-}else{
-attempts++;
-msg.innerHTML = "Kod noto‘g‘ri ("+attempts+"/3)";
-msg.style.color = "orange";
+document.getElementById("chatPage").style.display="flex";
 }
+
+function sendMessage(){
+let input = document.getElementById("msgInput");
+let text = input.value;
+
+if(text.trim()==="") return;
+
+let messagesDiv = document.getElementById("messages");
+
+let msg = document.createElement("div");
+msg.className="message";
+msg.innerText = localStorage.getItem("user") + ": " + text;
+
+messagesDiv.appendChild(msg);
+
+input.value="";
+messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
+
 </script>
 
 </body>
