@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
 
 body{
-background:linear-gradient(180deg,#2b0000,#000814);
+background:#0f172a;
 color:white;
 height:100vh;
 display:flex;
@@ -19,74 +19,123 @@ align-items:center;
 
 .container{
 width:100%;
-max-width:400px;
-padding:20px;
+max-width:420px;
+height:95vh;
+background:#111827;
+border-radius:25px;
+overflow:hidden;
+box-shadow:0 0 40px rgba(0,0,0,0.6);
+position:relative;
 }
 
-.card{
-background:rgba(0,0,0,0.6);
-padding:25px;
-border-radius:20px;
-box-shadow:0 0 25px rgba(255,0,0,0.3);
-backdrop-filter:blur(10px);
+.screen{display:none;height:100%;flex-direction:column;}
+.active{display:flex;}
+
+.topbar{
+padding:18px;
+font-size:20px;
+font-weight:bold;
+background:#0b1220;
+display:flex;
+align-items:center;
+justify-content:space-between;
 }
 
-h1{margin-bottom:10px;text-align:center;}
-p{text-align:center;margin-bottom:20px;color:#aaa;}
+.search{
+padding:10px;
+margin:10px;
+border-radius:12px;
+background:#1f2937;
+border:none;
+color:white;
+}
+
+.chat-list{
+flex:1;
+overflow-y:auto;
+}
+
+.chat-item{
+display:flex;
+align-items:center;
+padding:15px;
+border-bottom:1px solid #1f2937;
+cursor:pointer;
+}
+
+.chat-item:hover{background:#1e293b;}
+
+.avatar{
+width:45px;
+height:45px;
+border-radius:50%;
+margin-right:12px;
+background:linear-gradient(45deg,#2563eb,#9333ea);
+display:flex;
+justify-content:center;
+align-items:center;
+font-weight:bold;
+}
+
+.chat-name{font-weight:bold;}
+.chat-msg{font-size:13px;color:#9ca3af;}
+
+.login-screen{
+justify-content:center;
+padding:30px;
+}
+
+.login-screen h1{
+text-align:center;
+margin-bottom:20px;
+}
 
 input{
-width:100%;
 padding:12px;
 margin-bottom:15px;
+border-radius:12px;
 border:none;
-border-radius:10px;
-background:#111;
+background:#1f2937;
 color:white;
 }
 
 button{
-width:100%;
 padding:12px;
-border:none;
 border-radius:12px;
-background:linear-gradient(90deg,red,blue);
+border:none;
+background:linear-gradient(90deg,#2563eb,#9333ea);
 color:white;
 font-weight:bold;
 cursor:pointer;
 }
 
-.link{
-margin-top:15px;
-text-align:center;
-color:#aaa;
-cursor:pointer;
-}
-
-.chat-list, .chat-page, .register{display:none;}
-
-.chat-item{
+.messages{
+flex:1;
 padding:15px;
-border-bottom:1px solid #222;
-cursor:pointer;
+overflow-y:auto;
 }
 
-.chat-item:hover{background:#111;}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-margin-bottom:15px;
-}
-
-.message{
-background:#111;
+.msg{
+background:#1f2937;
 padding:10px;
-border-radius:10px;
-margin-top:10px;
+border-radius:12px;
+margin-bottom:10px;
+max-width:75%;
 }
 
-input[type=text]{
-margin-top:10px;
+.bottom-input{
+display:flex;
+padding:10px;
+background:#0b1220;
+}
+
+.bottom-input input{
+flex:1;
+margin:0;
+}
+
+.back{
+cursor:pointer;
 }
 </style>
 </head>
@@ -95,84 +144,97 @@ margin-top:10px;
 <div class="container">
 
 <!-- LOGIN -->
-<div class="card login">
+<div class="screen login-screen active" id="login">
 <h1>Bailgram</h1>
-<p>Professional muloqot platformasi</p>
+<p style="text-align:center;color:#9ca3af;margin-bottom:20px;">
+Professional muloqot platformasi
+</p>
 <input type="email" placeholder="Email">
 <input type="password" placeholder="Parol">
-<button onclick="openChatList()">Kirish</button>
-<div class="link" onclick="openRegister()">Akkaunt yo'qmi? Ro'yxatdan o'tish</div>
-</div>
-
-<!-- REGISTER -->
-<div class="card register">
-<h1>Ro'yxatdan o'tish</h1>
-<input type="text" placeholder="Ismingiz">
-<input type="email" placeholder="Email">
-<input type="password" placeholder="Parol">
-<button onclick="openChatList()">Ro'yxatdan o'tish</button>
-<div class="link" onclick="openLogin()">Orqaga</div>
+<button onclick="openChats()">Kirish</button>
 </div>
 
 <!-- CHAT LIST -->
-<div class="card chat-list">
+<div class="screen" id="chats">
 <div class="topbar">
-<h2>Chatlar</h2>
-<button onclick="logout()">Chiqish</button>
+<span>Chat</span>
 </div>
 
-<div class="chat-item" onclick="openChat()">
-<b>Bailgram Rasmiy</b><br>
-<small>Rasmiy tizim xabari</small>
+<input class="search" placeholder="Qidirish...">
+
+<div class="chat-list">
+
+<div class="chat-item" onclick="openChat('rasmiy')">
+<div class="avatar">B</div>
+<div>
+<div class="chat-name">Bailgram Rasmiy Xizmati</div>
+<div class="chat-msg">Rasmiy kanal</div>
+</div>
+</div>
+
+<div class="chat-item" onclick="openChat('bailpro')">
+<div class="avatar">P</div>
+<div>
+<div class="chat-name">BailPro</div>
+<div class="chat-msg">Premium xizmat</div>
+</div>
 </div>
 
 </div>
+</div>
 
-<!-- CHAT PAGE -->
-<div class="card chat-page">
+<!-- RASMIY CHAT -->
+<div class="screen" id="rasmiy">
 <div class="topbar">
-<button onclick="backToList()">⬅</button>
-<h3>Bailgram Rasmiy</h3>
+<span class="back" onclick="back()">⬅</span>
+<span>Bailgram Rasmiy Xizmati</span>
 </div>
 
-<div class="message">
+<div class="messages">
+<div class="msg">
 Salom, siz birinchi marta telefondan kirdingiz.
 </div>
+</div>
 
-<input type="text" placeholder="Xabar yozing...">
+<div class="bottom-input">
+<input placeholder="Xabar yozing...">
+</div>
+</div>
+
+<!-- BAILPRO CHAT -->
+<div class="screen" id="bailpro">
+<div class="topbar">
+<span class="back" onclick="back()">⬅</span>
+<span>BailPro</span>
+</div>
+
+<div class="messages">
+<div class="msg">
+BailPro — Premium foydalanuvchilar uchun maxsus xizmat.
+</div>
+</div>
+
+<div class="bottom-input">
+<input placeholder="Xabar yozing...">
+</div>
 </div>
 
 </div>
 
 <script>
-function openRegister(){
-document.querySelector('.login').style.display='none';
-document.querySelector('.register').style.display='block';
+function openChats(){
+document.getElementById('login').classList.remove('active');
+document.getElementById('chats').classList.add('active');
 }
 
-function openLogin(){
-document.querySelector('.register').style.display='none';
-document.querySelector('.login').style.display='block';
+function openChat(id){
+document.getElementById('chats').classList.remove('active');
+document.getElementById(id).classList.add('active');
 }
 
-function openChatList(){
-document.querySelector('.login').style.display='none';
-document.querySelector('.register').style.display='none';
-document.querySelector('.chat-list').style.display='block';
-}
-
-function openChat(){
-document.querySelector('.chat-list').style.display='none';
-document.querySelector('.chat-page').style.display='block';
-}
-
-function backToList(){
-document.querySelector('.chat-page').style.display='none';
-document.querySelector('.chat-list').style.display='block';
-}
-
-function logout(){
-location.reload();
+function back(){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById('chats').classList.add('active');
 }
 </script>
 
