@@ -6,128 +6,174 @@
 <title>Bailgram</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:#0f172a;
-color:white;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
 
-/* LOGIN */
-#loginPage{
-display:flex;
+body{
+background:linear-gradient(180deg,#2b0000,#000814);
+color:white;
 height:100vh;
+display:flex;
 justify-content:center;
 align-items:center;
-flex-direction:column;
 }
 
+.container{
+width:100%;
+max-width:400px;
+padding:20px;
+}
+
+.card{
+background:rgba(0,0,0,0.6);
+padding:25px;
+border-radius:20px;
+box-shadow:0 0 25px rgba(255,0,0,0.3);
+backdrop-filter:blur(10px);
+}
+
+h1{margin-bottom:10px;text-align:center;}
+p{text-align:center;margin-bottom:20px;color:#aaa;}
+
 input{
+width:100%;
 padding:12px;
-width:220px;
+margin-bottom:15px;
 border:none;
-border-radius:8px;
-margin-bottom:10px;
+border-radius:10px;
+background:#111;
+color:white;
 }
 
 button{
-padding:12px 20px;
+width:100%;
+padding:12px;
 border:none;
-border-radius:8px;
-background:#2563eb;
+border-radius:12px;
+background:linear-gradient(90deg,red,blue);
 color:white;
+font-weight:bold;
 cursor:pointer;
 }
 
-/* CHAT PAGE */
-#chatPage{
-display:none;
-height:100vh;
-flex-direction:column;
+.link{
+margin-top:15px;
+text-align:center;
+color:#aaa;
+cursor:pointer;
 }
+
+.chat-list, .chat-page, .register{display:none;}
+
+.chat-item{
+padding:15px;
+border-bottom:1px solid #222;
+cursor:pointer;
+}
+
+.chat-item:hover{background:#111;}
 
 .topbar{
-background:#1e293b;
-padding:15px;
-text-align:center;
-font-weight:bold;
-}
-
-.messages{
-flex:1;
-padding:10px;
-overflow-y:auto;
+display:flex;
+justify-content:space-between;
+margin-bottom:15px;
 }
 
 .message{
-background:#1e293b;
-padding:8px 12px;
-border-radius:10px;
-margin-bottom:8px;
-max-width:70%;
-}
-
-.bottom{
-display:flex;
+background:#111;
 padding:10px;
-background:#1e293b;
+border-radius:10px;
+margin-top:10px;
 }
 
-.bottom input{
-flex:1;
-margin:0;
-margin-right:10px;
+input[type=text]{
+margin-top:10px;
 }
 </style>
 </head>
-
 <body>
 
-<div id="loginPage">
-<h2>Bailgram</h2>
-<input type="text" id="username" placeholder="Username kiriting">
-<button onclick="login()">Kirish</button>
+<div class="container">
+
+<!-- LOGIN -->
+<div class="card login">
+<h1>Bailgram</h1>
+<p>Professional muloqot platformasi</p>
+<input type="email" placeholder="Email">
+<input type="password" placeholder="Parol">
+<button onclick="openChatList()">Kirish</button>
+<div class="link" onclick="openRegister()">Akkaunt yo'qmi? Ro'yxatdan o'tish</div>
 </div>
 
-<div id="chatPage">
-<div class="topbar">Bailgram Chat</div>
-<div class="messages" id="messages"></div>
-<div class="bottom">
-<input type="text" id="msgInput" placeholder="Xabar yozing...">
-<button onclick="sendMessage()">Yuborish</button>
+<!-- REGISTER -->
+<div class="card register">
+<h1>Ro'yxatdan o'tish</h1>
+<input type="text" placeholder="Ismingiz">
+<input type="email" placeholder="Email">
+<input type="password" placeholder="Parol">
+<button onclick="openChatList()">Ro'yxatdan o'tish</button>
+<div class="link" onclick="openLogin()">Orqaga</div>
 </div>
+
+<!-- CHAT LIST -->
+<div class="card chat-list">
+<div class="topbar">
+<h2>Chatlar</h2>
+<button onclick="logout()">Chiqish</button>
+</div>
+
+<div class="chat-item" onclick="openChat()">
+<b>Bailgram Rasmiy</b><br>
+<small>Rasmiy tizim xabari</small>
+</div>
+
+</div>
+
+<!-- CHAT PAGE -->
+<div class="card chat-page">
+<div class="topbar">
+<button onclick="backToList()">⬅</button>
+<h3>Bailgram Rasmiy</h3>
+</div>
+
+<div class="message">
+Salom, siz birinchi marta telefondan kirdingiz.
+</div>
+
+<input type="text" placeholder="Xabar yozing...">
+</div>
+
 </div>
 
 <script>
-
-function login(){
-let username = document.getElementById("username").value;
-if(username.trim() === "") return alert("Username kiriting");
-
-localStorage.setItem("user", username);
-
-document.getElementById("loginPage").style.display="none";
-document.getElementById("chatPage").style.display="flex";
+function openRegister(){
+document.querySelector('.login').style.display='none';
+document.querySelector('.register').style.display='block';
 }
 
-function sendMessage(){
-let input = document.getElementById("msgInput");
-let text = input.value;
-
-if(text.trim()==="") return;
-
-let messagesDiv = document.getElementById("messages");
-
-let msg = document.createElement("div");
-msg.className="message";
-msg.innerText = localStorage.getItem("user") + ": " + text;
-
-messagesDiv.appendChild(msg);
-
-input.value="";
-messagesDiv.scrollTop = messagesDiv.scrollHeight;
+function openLogin(){
+document.querySelector('.register').style.display='none';
+document.querySelector('.login').style.display='block';
 }
 
+function openChatList(){
+document.querySelector('.login').style.display='none';
+document.querySelector('.register').style.display='none';
+document.querySelector('.chat-list').style.display='block';
+}
+
+function openChat(){
+document.querySelector('.chat-list').style.display='none';
+document.querySelector('.chat-page').style.display='block';
+}
+
+function backToList(){
+document.querySelector('.chat-page').style.display='none';
+document.querySelector('.chat-list').style.display='block';
+}
+
+function logout(){
+location.reload();
+}
 </script>
 
 </body>
