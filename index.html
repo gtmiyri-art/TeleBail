@@ -1,241 +1,296 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bailgram</title>
+<title>TeleBail 2.0</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
-
 body{
-background:#0f172a;
-color:white;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+  color:white;
 }
 
-.container{
-width:100%;
-max-width:420px;
-height:95vh;
-background:#111827;
-border-radius:25px;
-overflow:hidden;
-box-shadow:0 0 40px rgba(0,0,0,0.6);
-position:relative;
+/* HEADER */
+.header{
+  padding:15px;
+  font-size:20px;
+  font-weight:bold;
 }
 
-.screen{display:none;height:100%;flex-direction:column;}
-.active{display:flex;}
-
-.topbar{
-padding:18px;
-font-size:20px;
-font-weight:bold;
-background:#0b1220;
-display:flex;
-align-items:center;
-justify-content:space-between;
+/* SEARCH */
+.search-box{
+  margin:10px;
 }
 
-.search{
-padding:10px;
-margin:10px;
-border-radius:12px;
-background:#1f2937;
-border:none;
-color:white;
+.search-box input{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+  background:rgba(255,255,255,0.1);
+  color:white;
 }
 
+/* CHAT LIST */
 .chat-list{
-flex:1;
-overflow-y:auto;
+  padding:10px;
+  padding-bottom:120px;
 }
 
-.chat-item{
-display:flex;
-align-items:center;
-padding:15px;
-border-bottom:1px solid #1f2937;
-cursor:pointer;
+.chat{
+  display:flex;
+  align-items:center;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:15px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(10px);
+  cursor:pointer;
 }
 
-.chat-item:hover{background:#1e293b;}
-
-.avatar{
-width:45px;
-height:45px;
-border-radius:50%;
-margin-right:12px;
-background:linear-gradient(45deg,#2563eb,#9333ea);
-display:flex;
-justify-content:center;
-align-items:center;
-font-weight:bold;
+.chat img{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  margin-right:10px;
 }
 
-.chat-name{font-weight:bold;}
-.chat-msg{font-size:13px;color:#9ca3af;}
-
-.login-screen{
-justify-content:center;
-padding:30px;
+.chat-name{
+  font-weight:bold;
 }
 
-.login-screen h1{
-text-align:center;
-margin-bottom:20px;
+.chat-message{
+  font-size:13px;
+  opacity:0.7;
 }
 
-input{
-padding:12px;
-margin-bottom:15px;
-border-radius:12px;
-border:none;
-background:#1f2937;
-color:white;
+/* CHAT WINDOW */
+.chat-window{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#111;
+  display:flex;
+  flex-direction:column;
 }
 
-button{
-padding:12px;
-border-radius:12px;
-border:none;
-background:linear-gradient(90deg,#2563eb,#9333ea);
-color:white;
-font-weight:bold;
-cursor:pointer;
+.chat-header{
+  padding:15px;
+  background:#1c1c1c;
+  display:flex;
+  align-items:center;
+}
+
+.back-btn{
+  margin-right:15px;
+  cursor:pointer;
+  color:#ff4d6d;
+  font-weight:bold;
 }
 
 .messages{
-flex:1;
-padding:15px;
-overflow-y:auto;
+  flex:1;
+  padding:15px;
+  overflow-y:auto;
 }
 
-.msg{
-background:#1f2937;
-padding:10px;
-border-radius:12px;
-margin-bottom:10px;
-max-width:75%;
+.message{
+  margin-bottom:10px;
+  max-width:70%;
+  padding:10px;
+  border-radius:15px;
+  font-size:14px;
 }
 
-.bottom-input{
-display:flex;
-padding:10px;
-background:#0b1220;
+.sent{
+  background:#ff0057;
+  margin-left:auto;
 }
 
-.bottom-input input{
-flex:1;
-margin:0;
+.received{
+  background:#333;
 }
 
-.back{
-cursor:pointer;
+/* INPUT AREA */
+.input-area{
+  display:flex;
+  padding:10px;
+  background:#1c1c1c;
+}
+
+.input-area input{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+}
+
+.send-btn{
+  margin-left:10px;
+  padding:10px 15px;
+  border:none;
+  border-radius:20px;
+  background:#ff0057;
+  color:white;
+  cursor:pointer;
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;
+  bottom:15px;
+  left:50%;
+  transform:translateX(-50%);
+  width:90%;
+  height:65px;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(20px);
+  border-radius:30px;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow:0 0 20px rgba(255,0,80,0.4);
+}
+
+.nav-item{
+  font-size:22px;
+  opacity:0.6;
+  cursor:pointer;
+}
+
+.nav-item.active{
+  background:linear-gradient(45deg,#ff0057,#ff7b00);
+  padding:12px;
+  border-radius:50%;
+  opacity:1;
+  box-shadow:0 0 15px #ff0057;
+}
+
+.profile-img{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:2px solid #ff0057;
 }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="header">TeleBail Messages</div>
 
-<!-- LOGIN -->
-<div class="screen login-screen active" id="login">
-<h1>Bailgram</h1>
-<p style="text-align:center;color:#9ca3af;margin-bottom:20px;">
-Professional muloqot platformasi
-</p>
-<input type="email" placeholder="Email">
-<input type="password" placeholder="Parol">
-<button onclick="openChats()">Kirish</button>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search...">
 </div>
 
-<!-- CHAT LIST -->
-<div class="screen" id="chats">
-<div class="topbar">
-<span>Chat</span>
-</div>
+<div class="chat-list" id="chatList">
 
-<input class="search" placeholder="Qidirish...">
+  <div class="chat" onclick="openChat('AntiBail Bot')">
+    <img src="https://i.pravatar.cc/150?img=12">
+    <div>
+      <div class="chat-name">AntiBail Bot</div>
+      <div class="chat-message">Rasmiy kod yuborildi</div>
+    </div>
+  </div>
 
-<div class="chat-list">
-
-<div class="chat-item" onclick="openChat('rasmiy')">
-<div class="avatar">B</div>
-<div>
-<div class="chat-name">Bailgram Rasmiy Xizmati</div>
-<div class="chat-msg">Rasmiy kanal</div>
-</div>
-</div>
-
-<div class="chat-item" onclick="openChat('bailpro')">
-<div class="avatar">P</div>
-<div>
-<div class="chat-name">BailPro</div>
-<div class="chat-msg">Premium xizmat</div>
-</div>
-</div>
+  <div class="chat" onclick="openChat('BailPro Support')">
+    <img src="https://i.pravatar.cc/150?img=32">
+    <div>
+      <div class="chat-name">BailPro Support</div>
+      <div class="chat-message">Appeal yuboring</div>
+    </div>
+  </div>
 
 </div>
+
+<!-- CHAT WINDOW -->
+<div class="chat-window" id="chatWindow">
+  
+  <div class="chat-header">
+    <div class="back-btn" onclick="closeChat()">⬅</div>
+    <div id="chatTitle"></div>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input-area">
+    <input type="text" id="messageInput" placeholder="Xabar yozing...">
+    <button class="send-btn" onclick="sendMessage()">Yuborish</button>
+  </div>
+
 </div>
 
-<!-- RASMIY CHAT -->
-<div class="screen" id="rasmiy">
-<div class="topbar">
-<span class="back" onclick="back()">⬅</span>
-<span>Bailgram Rasmiy Xizmati</span>
-</div>
-
-<div class="messages">
-<div class="msg">
-Salom, siz birinchi marta telefondan kirdingiz.
-</div>
-</div>
-
-<div class="bottom-input">
-<input placeholder="Xabar yozing...">
-</div>
-</div>
-
-<!-- BAILPRO CHAT -->
-<div class="screen" id="bailpro">
-<div class="topbar">
-<span class="back" onclick="back()">⬅</span>
-<span>BailPro</span>
-</div>
-
-<div class="messages">
-<div class="msg">
-BailPro — Premium foydalanuvchilar uchun maxsus xizmat.
-</div>
-</div>
-
-<div class="bottom-input">
-<input placeholder="Xabar yozing...">
-</div>
-</div>
-
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active">💬</div>
+  <div class="nav-item">👤</div>
+  <div class="nav-item">⚙️</div>
+  <img src="https://i.pravatar.cc/150?img=5" class="profile-img">
 </div>
 
 <script>
-function openChats(){
-document.getElementById('login').classList.remove('active');
-document.getElementById('chats').classList.add('active');
+
+let currentChat = "";
+
+function openChat(name){
+  currentChat = name;
+  document.getElementById("chatTitle").innerText = name;
+  document.getElementById("chatWindow").style.display = "flex";
+  document.getElementById("messages").innerHTML = "";
 }
 
-function openChat(id){
-document.getElementById('chats').classList.remove('active');
-document.getElementById(id).classList.add('active');
+function closeChat(){
+  document.getElementById("chatWindow").style.display = "none";
 }
 
-function back(){
-document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-document.getElementById('chats').classList.add('active');
+function sendMessage(){
+  let input = document.getElementById("messageInput");
+  let text = input.value.trim();
+  if(text === "") return;
+
+  addMessage(text, "sent");
+  input.value = "";
+
+  setTimeout(() => {
+    addMessage(getBotReply(text), "received");
+  }, 800);
 }
+
+function addMessage(text, type){
+  let msgDiv = document.createElement("div");
+  msgDiv.classList.add("message", type);
+  msgDiv.innerText = text;
+  document.getElementById("messages").appendChild(msgDiv);
+  document.getElementById("messages").scrollTop = 999999;
+}
+
+function getBotReply(userText){
+  if(currentChat === "AntiBail Bot"){
+    return "Rasmiy kod: 847392";
+  }
+  if(currentChat === "BailPro Support"){
+    return "Appealingiz qabul qilindi.";
+  }
+  return "Javob uchun rahmat!";
+}
+
+document.getElementById("searchInput").addEventListener("keyup", function(){
+  let filter = this.value.toLowerCase();
+  let chats = document.getElementsByClassName("chat");
+
+  for(let i=0;i<chats.length;i++){
+    let name = chats[i].innerText.toLowerCase();
+    chats[i].style.display = name.includes(filter) ? "" : "none";
+  }
+});
+
 </script>
 
 </body>
