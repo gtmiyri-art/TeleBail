@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bailgram 2.0</title>
+<title>Bailgram</title>
 
 <style>
 body{
@@ -16,23 +16,8 @@ body{
 /* HEADER */
 .header{
   padding:15px;
-  font-size:20px;
+  font-size:22px;
   font-weight:bold;
-}
-
-/* SEARCH */
-.search-box{
-  margin:10px;
-}
-
-.search-box input{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:20px;
-  outline:none;
-  background:rgba(255,255,255,0.1);
-  color:white;
 }
 
 /* CHAT LIST */
@@ -48,7 +33,6 @@ body{
   margin-bottom:10px;
   border-radius:15px;
   background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(10px);
   cursor:pointer;
 }
 
@@ -57,15 +41,6 @@ body{
   height:45px;
   border-radius:50%;
   margin-right:10px;
-}
-
-.chat-name{
-  font-weight:bold;
-}
-
-.chat-message{
-  font-size:13px;
-  opacity:0.7;
 }
 
 /* CHAT WINDOW */
@@ -85,13 +60,24 @@ body{
   background:#1c1c1c;
   display:flex;
   align-items:center;
-  font-weight:bold;
+  justify-content:space-between;
+}
+
+.left-head{
+  display:flex;
+  align-items:center;
 }
 
 .back-btn{
   margin-right:15px;
   cursor:pointer;
   color:#ff4d6d;
+  font-size:18px;
+}
+
+.menu-btn{
+  font-size:22px;
+  cursor:pointer;
 }
 
 .messages{
@@ -106,6 +92,8 @@ body{
   padding:10px;
   border-radius:15px;
   font-size:14px;
+  position:relative;
+  cursor:pointer;
 }
 
 .sent{
@@ -117,7 +105,11 @@ body{
   background:#333;
 }
 
-/* INPUT AREA */
+.selected{
+  outline:2px solid yellow;
+}
+
+/* INPUT */
 .input-area{
   display:flex;
   padding:10px;
@@ -151,70 +143,56 @@ body{
   width:90%;
   height:65px;
   background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(20px);
   border-radius:30px;
   display:flex;
   justify-content:space-around;
   align-items:center;
-  box-shadow:0 0 20px rgba(255,0,80,0.4);
 }
 
-.nav-item{
-  font-size:22px;
-  opacity:0.6;
+/* CONFIRM BOX */
+.confirm-box{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#222;
+  padding:20px;
+  border-radius:15px;
+  display:none;
+  text-align:center;
+}
+
+.confirm-box button{
+  margin:10px;
+  padding:8px 15px;
+  border:none;
+  border-radius:10px;
   cursor:pointer;
 }
 
-.nav-item.active{
-  background:linear-gradient(45deg,#ff0057,#ff7b00);
-  padding:12px;
-  border-radius:50%;
-  opacity:1;
-  box-shadow:0 0 15px #ff0057;
-}
-
-.profile-img{
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  border:2px solid #ff0057;
-}
+.yes{ background:red; color:white; }
+.no{ background:gray; color:white; }
 </style>
 </head>
 <body>
 
-<div class="header">TeleBail Messages</div>
-
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search...">
-</div>
+<div class="header">Bailgram</div>
 
 <div class="chat-list">
-
   <div class="chat" onclick="openChat('AntiBail Bot')">
     <img src="https://i.pravatar.cc/150?img=12">
-    <div>
-      <div class="chat-name">AntiBail Bot</div>
-      <div class="chat-message">Rasmiy kod yuborildi</div>
-    </div>
+    <div>AntiBail Bot</div>
   </div>
-
-  <div class="chat" onclick="openChat('BailPro Support')">
-    <img src="https://i.pravatar.cc/150?img=32">
-    <div>
-      <div class="chat-name">BailPro Support</div>
-      <div class="chat-message">Appeal yuboring</div>
-    </div>
-  </div>
-
 </div>
 
-<!-- CHAT WINDOW -->
 <div class="chat-window" id="chatWindow">
 
   <div class="chat-header">
-    <div class="back-btn" onclick="closeChat()">⬅</div>
-    <div id="chatTitle"></div>
+    <div class="left-head">
+      <div class="back-btn" onclick="closeChat()">⬅</div>
+      <div id="chatTitle"></div>
+    </div>
+    <div class="menu-btn" onclick="showDelete()">⋮</div>
   </div>
 
   <div class="messages" id="messages"></div>
@@ -226,41 +204,47 @@ body{
 
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottomNav">
-  <div class="nav-item active">💬</div>
-  <div class="nav-item">👤</div>
-  <div class="nav-item">⚙️</div>
-  <img src="https://i.pravatar.cc/150?img=5" class="profile-img">
+  💬 👤 ⚙️
+</div>
+
+<div class="confirm-box" id="confirmBox">
+  <div>Barini o‘chirasizmi?</div>
+  <button class="yes" onclick="deleteAll()">Ha</button>
+  <button class="no" onclick="hideConfirm()">Yo‘q</button>
 </div>
 
 <script>
 
-let currentChat = "";
+let currentChat="";
+let selectedMessage=null;
 
 function openChat(name){
-  currentChat = name;
-  document.getElementById("chatTitle").innerText = name;
-  document.getElementById("chatWindow").style.display = "flex";
-  document.getElementById("bottomNav").style.display = "none";
-  document.getElementById("messages").innerHTML = "";
+  currentChat=name;
+  document.getElementById("chatTitle").innerText=name;
+  document.getElementById("chatWindow").style.display="flex";
+  document.getElementById("bottomNav").style.display="none";
+  loadMessages();
 }
 
 function closeChat(){
-  document.getElementById("chatWindow").style.display = "none";
-  document.getElementById("bottomNav").style.display = "flex";
+  document.getElementById("chatWindow").style.display="none";
+  document.getElementById("bottomNav").style.display="flex";
 }
 
 function sendMessage(){
-  let input = document.getElementById("messageInput");
-  let text = input.value.trim();
-  if(text === "") return;
+  let input=document.getElementById("messageInput");
+  let text=input.value.trim();
+  if(text==="")return;
 
+  saveMessage(text,"sent");
   addMessage(text,"sent");
   input.value="";
 
   setTimeout(()=>{
-    addMessage(getBotReply(text),"received");
+    let reply="Rasmiy kod: 847392";
+    saveMessage(reply,"received");
+    addMessage(reply,"received");
   },800);
 }
 
@@ -268,24 +252,45 @@ function addMessage(text,type){
   let msg=document.createElement("div");
   msg.classList.add("message",type);
   msg.innerText=text;
+
+  msg.onclick=function(){
+    document.querySelectorAll(".message").forEach(m=>m.classList.remove("selected"));
+    msg.classList.add("selected");
+    selectedMessage=msg;
+  };
+
   document.getElementById("messages").appendChild(msg);
   document.getElementById("messages").scrollTop=999999;
 }
 
-function getBotReply(text){
-  if(currentChat==="AntiBail Bot"){
-    return "Rasmiy kod: 847392";
-  }
-  if(currentChat==="BailPro Support"){
-    return "Appealingiz qabul qilindi.";
-  }
-  return "Rahmat!";
+function saveMessage(text,type){
+  let data=JSON.parse(localStorage.getItem(currentChat))||[];
+  data.push({text,type});
+  localStorage.setItem(currentChat,JSON.stringify(data));
+}
+
+function loadMessages(){
+  document.getElementById("messages").innerHTML="";
+  let data=JSON.parse(localStorage.getItem(currentChat))||[];
+  data.forEach(m=>addMessage(m.text,m.type));
+}
+
+function showDelete(){
+  document.getElementById("confirmBox").style.display="block";
+}
+
+function hideConfirm(){
+  document.getElementById("confirmBox").style.display="none";
+}
+
+function deleteAll(){
+  localStorage.removeItem(currentChat);
+  document.getElementById("messages").innerHTML="";
+  hideConfirm();
 }
 
 document.getElementById("messageInput").addEventListener("keypress",function(e){
-  if(e.key==="Enter"){
-    sendMessage();
-  }
+  if(e.key==="Enter") sendMessage();
 });
 
 </script>
