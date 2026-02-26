@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,32 +8,38 @@
 <style>
 body{
 margin:0;
-font-family:Arial;
-background:linear-gradient(to bottom,#1e1b4b,#312e81);
+font-family:sans-serif;
+background:linear-gradient(#2d2a70,#2b2c6f);
 color:white;
 }
 
-/* HOME */
-#home{
-padding-bottom:70px;
-}
-
+/* HEADER */
 .header{
 padding:20px;
-font-size:22px;
+font-size:24px;
 font-weight:bold;
 }
 
+/* CHAT LIST */
 .chat-list{
-padding:15px;
+padding:10px;
 }
 
 .chat-item{
-background:#4338ca;
+background:rgba(255,255,255,0.08);
 padding:15px;
-border-radius:15px;
-margin-bottom:10px;
+border-radius:20px;
+display:flex;
+align-items:center;
+margin-bottom:15px;
 cursor:pointer;
+}
+
+.chat-item img{
+width:50px;
+height:50px;
+border-radius:50%;
+margin-right:15px;
 }
 
 /* CHAT WINDOW */
@@ -41,44 +47,46 @@ cursor:pointer;
 display:none;
 flex-direction:column;
 height:100vh;
-padding-bottom:120px;
 }
 
-.chat-header{
-background:#111;
-padding:15px;
+.chat-top{
 display:flex;
-justify-content:space-between;
 align-items:center;
-font-weight:bold;
+padding:15px;
+background:rgba(0,0,0,0.2);
+}
+
+.back-btn{
+margin-right:10px;
+cursor:pointer;
 }
 
 .messages{
 flex:1;
 overflow-y:auto;
-padding:15px;
-margin-bottom:10px;
+padding:10px;
+margin-bottom:70px;
 }
 
-.msg{
-background:#ff0066;
-padding:10px;
+.message{
+background:#444;
+padding:10px 15px;
 border-radius:15px;
-margin-bottom:8px;
+margin-bottom:10px;
+width:max-content;
 max-width:70%;
-word-wrap:break-word;
 }
 
 .input-area{
 display:flex;
-padding:10px;
-background:#111;
 position:fixed;
 bottom:60px;
 width:100%;
+padding:10px;
+background:#1c1c3c;
 }
 
-input{
+.input-area input{
 flex:1;
 padding:10px;
 border-radius:20px;
@@ -86,42 +94,20 @@ border:none;
 outline:none;
 }
 
-button{
-background:#ff0066;
-border:none;
-color:white;
+.input-area button{
+margin-left:10px;
 padding:10px 15px;
+border:none;
 border-radius:20px;
-margin-left:5px;
+background:#6c63ff;
+color:white;
 cursor:pointer;
 }
 
-/* PROFILE */
-.profile{
+/* PROFILE & SETTINGS */
+.page{
 display:none;
 padding:20px;
-padding-bottom:80px;
-}
-
-.profile-card{
-background:#111;
-padding:30px;
-border-radius:20px;
-text-align:center;
-}
-
-/* SETTINGS */
-.settings{
-display:none;
-padding:20px;
-padding-bottom:80px;
-}
-
-.setting-item{
-background:#111;
-padding:15px;
-border-radius:15px;
-margin-bottom:10px;
 }
 
 /* BOTTOM MENU */
@@ -129,135 +115,122 @@ margin-bottom:10px;
 position:fixed;
 bottom:0;
 width:100%;
-background:#000;
+background:black;
 display:flex;
 justify-content:space-around;
-padding:15px 0;
+padding:10px 0;
+border-radius:20px 20px 0 0;
 }
 
-.menu-btn{
-color:white;
+.bottom div{
+text-align:center;
 cursor:pointer;
+font-size:14px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HOME -->
-<div id="home">
+<!-- MAIN CHAT LIST -->
+<div id="main">
 <div class="header">Bailgram Messages</div>
 
 <div class="chat-list">
-<div class="chat-item" onclick="openChat('AntiBail Bot')">AntiBail Bot</div>
-<div class="chat-item" onclick="openChat('BailPro Support')">BailPro Support</div>
+<div class="chat-item" onclick="openChat('AntiBail Bot')">
+<img src="https://i.pravatar.cc/100?img=12">
+<span>AntiBail Bot</span>
+</div>
+
+<div class="chat-item" onclick="openChat('BailPro Support')">
+<img src="https://i.pravatar.cc/100?img=5">
+<span>BailPro Support</span>
+</div>
 </div>
 </div>
 
-<!-- CHAT -->
+<!-- CHAT WINDOW -->
 <div class="chat-window" id="chatWindow">
-<div class="chat-header">
+<div class="chat-top">
+<span class="back-btn" onclick="closeChat()">⬅</span>
 <span id="chatName"></span>
-<span onclick="toggleMenu()">⋮</span>
 </div>
 
 <div class="messages" id="messages"></div>
 
 <div class="input-area">
-<input type="text" id="msgInput" placeholder="Xabar yozing...">
-<button onclick="sendMsg()">Yuborish</button>
+<input type="text" id="messageInput" placeholder="Message...">
+<button onclick="sendMessage()">Send</button>
 </div>
 </div>
 
 <!-- PROFILE -->
-<div class="profile" id="profile">
-<div class="profile-card">
-<h2>DARIK.WEB M1</h2>
-<p>Onlayn</p>
-<p>+998 90 123 45 67</p>
-</div>
+<div class="page" id="profilePage">
+<h2>Profile</h2>
+<p>Name: User</p>
+<p>Status: Online</p>
 </div>
 
 <!-- SETTINGS -->
-<div class="settings" id="settings">
-<div class="setting-item">Hisob</div>
-<div class="setting-item">Chat sozlamalari</div>
-<div class="setting-item">Maxfiylik va xavfsizlik</div>
-<div class="setting-item">Bildirishnomalar</div>
-<div class="setting-item">Til: O‘zbek</div>
+<div class="page" id="settingsPage">
+<h2>Settings</h2>
+<p>Notifications</p>
+<p>Privacy</p>
+<p>Language</p>
 </div>
 
-<!-- BOTTOM -->
+<!-- BOTTOM MENU -->
 <div class="bottom">
-<div class="menu-btn" onclick="goHome()">Chats</div>
-<div class="menu-btn" onclick="openProfile()">Profile</div>
-<div class="menu-btn" onclick="openSettings()">Settings</div>
+<div onclick="showMain()">Chats</div>
+<div onclick="showProfile()">Profile</div>
+<div onclick="showSettings()">Settings</div>
 </div>
 
 <script>
-let currentChat="";
-
 function openChat(name){
-document.getElementById("home").style.display="none";
-document.getElementById("profile").style.display="none";
-document.getElementById("settings").style.display="none";
+document.getElementById("main").style.display="none";
+document.getElementById("profilePage").style.display="none";
+document.getElementById("settingsPage").style.display="none";
 document.getElementById("chatWindow").style.display="flex";
 document.getElementById("chatName").innerText=name;
-document.getElementById("messages").innerHTML="";
-currentChat=name;
 }
 
-function goHome(){
-document.getElementById("home").style.display="block";
+function closeChat(){
 document.getElementById("chatWindow").style.display="none";
-document.getElementById("profile").style.display="none";
-document.getElementById("settings").style.display="none";
+document.getElementById("main").style.display="block";
 }
 
-function openProfile(){
-goHome();
-document.getElementById("home").style.display="none";
-document.getElementById("profile").style.display="block";
-}
+function sendMessage(){
+let input=document.getElementById("messageInput");
+if(input.value.trim()=="") return;
 
-function openSettings(){
-goHome();
-document.getElementById("home").style.display="none";
-document.getElementById("settings").style.display="block";
-}
+let msg=document.createElement("div");
+msg.className="message";
+msg.innerText=input.value;
 
-function sendMsg(){
-let input=document.getElementById("msgInput");
-let text=input.value.trim();
-if(text==="") return;
-
-let msgBox=document.getElementById("messages");
-
-let div=document.createElement("div");
-div.className="msg";
-div.innerText=text;
-msgBox.appendChild(div);
-
+document.getElementById("messages").appendChild(msg);
 input.value="";
-msgBox.scrollTop=msgBox.scrollHeight;
-
-setTimeout(()=>{
-let reply=document.createElement("div");
-reply.className="msg";
-
-if(text.toLowerCase()=="salom"){
-reply.innerText="Salom 👋\nRasmiy kod: 843565";
-}else{
-reply.innerText="Rasmiy kod: 843565";
 }
 
-msgBox.appendChild(reply);
-msgBox.scrollTop=msgBox.scrollHeight;
-},700);
+function showProfile(){
+document.getElementById("main").style.display="none";
+document.getElementById("chatWindow").style.display="none";
+document.getElementById("settingsPage").style.display="none";
+document.getElementById("profilePage").style.display="block";
 }
 
-function toggleMenu(){
-alert("Chat ma'lumotlari\nTozalash\nBloklash\nYopish");
+function showSettings(){
+document.getElementById("main").style.display="none";
+document.getElementById("chatWindow").style.display="none";
+document.getElementById("profilePage").style.display="none";
+document.getElementById("settingsPage").style.display="block";
+}
+
+function showMain(){
+document.getElementById("profilePage").style.display="none";
+document.getElementById("settingsPage").style.display="none";
+document.getElementById("chatWindow").style.display="none";
+document.getElementById("main").style.display="block";
 }
 </script>
 
