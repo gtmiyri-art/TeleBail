@@ -8,9 +8,10 @@
 <style>
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:Arial;
 background:linear-gradient(135deg,#1e1b4b,#312e81);
 color:white;
+overflow:hidden;
 }
 
 /* HEADER */
@@ -20,25 +21,19 @@ font-size:22px;
 font-weight:bold;
 }
 
-/* PAGES */
+/* CHAT LIST */
 .page{
-display:none;
 padding:10px;
 padding-bottom:120px;
 }
 
-.active-page{
-display:block;
-}
-
-/* CHAT LIST */
 .chat{
 display:flex;
 align-items:center;
 padding:12px;
-margin-bottom:10px;
 border-radius:15px;
 background:rgba(255,255,255,0.08);
+margin-bottom:10px;
 cursor:pointer;
 }
 
@@ -65,14 +60,19 @@ flex-direction:column;
 padding:15px;
 background:#1c1c1c;
 display:flex;
+justify-content:space-between;
 align-items:center;
 }
 
 .back-btn{
-margin-right:15px;
 cursor:pointer;
 color:#ff4d6d;
-font-weight:bold;
+margin-right:10px;
+}
+
+.menu-btn{
+cursor:pointer;
+font-size:22px;
 }
 
 .messages{
@@ -82,11 +82,13 @@ overflow-y:auto;
 }
 
 .message{
+position:relative;
 margin-bottom:10px;
 max-width:70%;
 padding:10px;
 border-radius:15px;
 font-size:14px;
+cursor:pointer;
 }
 
 .sent{
@@ -96,6 +98,19 @@ margin-left:auto;
 
 .received{
 background:#333;
+}
+
+/* selection circle */
+.select-circle{
+position:absolute;
+left:-25px;
+top:50%;
+transform:translateY(-50%);
+width:15px;
+height:15px;
+border-radius:50%;
+background:white;
+display:none;
 }
 
 /* INPUT */
@@ -130,8 +145,8 @@ bottom:15px;
 left:50%;
 transform:translateX(-50%);
 width:90%;
-height:65px;
-background:rgba(0,0,0,0.7);
+height:70px;
+background:rgba(0,0,0,0.8);
 border-radius:30px;
 display:flex;
 justify-content:space-around;
@@ -139,13 +154,61 @@ align-items:center;
 }
 
 .nav-item{
+display:flex;
+flex-direction:column;
+align-items:center;
+font-size:12px;
 cursor:pointer;
 opacity:0.7;
 }
 
+.nav-item span{
+font-size:22px;
+}
+
 .nav-item.active{
 opacity:1;
-font-weight:bold;
+}
+
+/* MENU BOX */
+.menu-box{
+position:absolute;
+top:60px;
+right:15px;
+background:#222;
+padding:10px;
+border-radius:10px;
+display:none;
+}
+
+.menu-box div{
+padding:8px;
+cursor:pointer;
+}
+
+.menu-box div:hover{
+background:#333;
+}
+
+/* CONFIRM BOX */
+.confirm-box{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#222;
+padding:20px;
+border-radius:15px;
+display:none;
+text-align:center;
+}
+
+.confirm-box button{
+margin:10px;
+padding:8px 15px;
+border:none;
+border-radius:10px;
+cursor:pointer;
 }
 </style>
 </head>
@@ -153,38 +216,31 @@ font-weight:bold;
 
 <div class="header">Bailgram Messages</div>
 
-<!-- CHATS PAGE -->
-<div class="page active-page" id="chatsPage">
+<div class="page">
 <div class="chat" onclick="openChat('AntiBail Bot')">
 <img src="https://i.pravatar.cc/150?img=12">
 <div>AntiBail Bot</div>
 </div>
-</div>
 
-<!-- PROFILE PAGE -->
-<div class="page" id="profilePage">
-<h3>Profil sahifasi</h3>
-<p>Ism: Foydalanuvchi</p>
+<div class="chat" onclick="openChat('BailPro Support')">
+<img src="https://i.pravatar.cc/150?img=5">
+<div>BailPro Support</div>
 </div>
-
-<!-- CONTACTS PAGE -->
-<div class="page" id="contactsPage">
-<h3>Kontaktlar</h3>
-<p>Kontaktlar ro'yxati shu yerda bo'ladi</p>
-</div>
-
-<!-- SETTINGS PAGE -->
-<div class="page" id="settingsPage">
-<h3>Sozlamalar</h3>
-<p>Til, xavfsizlik va boshqalar</p>
 </div>
 
 <!-- CHAT WINDOW -->
 <div class="chat-window" id="chatWindow">
 
 <div class="chat-header">
-<div class="back-btn" onclick="closeChat()">⬅</div>
-<div id="chatTitle"></div>
+<div>
+<span class="back-btn" onclick="closeChat()">⬅</span>
+<span id="chatTitle"></span>
+</div>
+<div class="menu-btn" onclick="toggleMenu()">⋮</div>
+</div>
+
+<div class="menu-box" id="menuBox">
+<div onclick="confirmDelete()">Barcha xabarlarni o‘chirish</div>
 </div>
 
 <div class="messages" id="messages"></div>
@@ -196,25 +252,22 @@ font-weight:bold;
 
 </div>
 
+<!-- CONFIRM -->
+<div class="confirm-box" id="confirmBox">
+<p>Haqiqatan ham o‘chirmoqchimisiz?</p>
+<button onclick="deleteAll()">Ha</button>
+<button onclick="closeConfirm()">Yo‘q</button>
+</div>
+
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottomNav">
-<div class="nav-item active" onclick="showPage('chatsPage',this)">Chats</div>
-<div class="nav-item" onclick="showPage('profilePage',this)">Profile</div>
-<div class="nav-item" onclick="showPage('contactsPage',this)">Contacts</div>
-<div class="nav-item" onclick="showPage('settingsPage',this)">Settings</div>
+<div class="nav-item active"><span>💬</span>Chats</div>
+<div class="nav-item"><span>👤</span>Profile</div>
+<div class="nav-item"><span>⚙</span>Settings</div>
 </div>
 
 <script>
-
 let currentChat="";
-
-function showPage(pageId,el){
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active-page"));
-document.getElementById(pageId).classList.add("active-page");
-
-document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-el.classList.add("active");
-}
 
 function openChat(name){
 currentChat=name;
@@ -231,44 +284,52 @@ document.getElementById("bottomNav").style.display="flex";
 
 function sendMessage(){
 let input=document.getElementById("messageInput");
-let text=input.value.trim();
-if(text==="")return;
+if(input.value.trim()=="") return;
 
-saveMessage(text,"sent");
-addMessage(text,"sent");
-input.value="";
-
-setTimeout(()=>{
-let reply="Rasmiy kod: 847392";
-saveMessage(reply,"received");
-addMessage(reply,"received");
-},800);
-}
-
-function addMessage(text,type){
-let msg=document.createElement("div");
-msg.classList.add("message",type);
-msg.innerText=text;
-document.getElementById("messages").appendChild(msg);
-document.getElementById("messages").scrollTop=999999;
-}
-
-function saveMessage(text,type){
-let data=JSON.parse(localStorage.getItem(currentChat))||[];
-data.push({text,type});
+let data=JSON.parse(localStorage.getItem(currentChat)||"[]");
+data.push({text:input.value});
 localStorage.setItem(currentChat,JSON.stringify(data));
+input.value="";
+loadMessages();
 }
 
 function loadMessages(){
-document.getElementById("messages").innerHTML="";
-let data=JSON.parse(localStorage.getItem(currentChat))||[];
-data.forEach(m=>addMessage(m.text,m.type));
+let box=document.getElementById("messages");
+box.innerHTML="";
+let data=JSON.parse(localStorage.getItem(currentChat)||"[]");
+
+data.forEach((msg,i)=>{
+let div=document.createElement("div");
+div.className="message sent";
+div.innerHTML='<div class="select-circle"></div>'+msg.text;
+div.onclick=function(){ toggleSelect(this); }
+box.appendChild(div);
+});
 }
 
-document.getElementById("messageInput").addEventListener("keypress",function(e){
-if(e.key==="Enter") sendMessage();
-});
+function toggleSelect(el){
+let circle=el.querySelector(".select-circle");
+circle.style.display=circle.style.display=="block"?"none":"block";
+}
 
+function toggleMenu(){
+let m=document.getElementById("menuBox");
+m.style.display=m.style.display=="block"?"none":"block";
+}
+
+function confirmDelete(){
+document.getElementById("confirmBox").style.display="block";
+}
+
+function closeConfirm(){
+document.getElementById("confirmBox").style.display="none";
+}
+
+function deleteAll(){
+localStorage.removeItem(currentChat);
+loadMessages();
+closeConfirm();
+}
 </script>
 
 </body>
