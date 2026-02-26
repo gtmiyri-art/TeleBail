@@ -100,7 +100,6 @@ margin-left:auto;
 background:#333;
 }
 
-/* selection circle */
 .select-circle{
 position:absolute;
 left:-25px;
@@ -214,9 +213,9 @@ cursor:pointer;
 </head>
 <body>
 
-<div class="header">Bailgram Messages</div>
+<div class="header" id="mainHeader">Bailgram Messages</div>
 
-<div class="page">
+<div class="page" id="mainPage">
 <div class="chat" onclick="openChat('AntiBail Bot')">
 <img src="https://i.pravatar.cc/150?img=12">
 <div>AntiBail Bot</div>
@@ -230,7 +229,6 @@ cursor:pointer;
 
 <!-- CHAT WINDOW -->
 <div class="chat-window" id="chatWindow">
-
 <div class="chat-header">
 <div>
 <span class="back-btn" onclick="closeChat()">⬅</span>
@@ -249,7 +247,35 @@ cursor:pointer;
 <input type="text" id="messageInput" placeholder="Xabar yozing...">
 <button class="send-btn" onclick="sendMessage()">Yuborish</button>
 </div>
+</div>
 
+<!-- PROFILE PAGE -->
+<div class="chat-window" id="profilePage">
+<div class="chat-header">
+<div>
+<span class="back-btn" onclick="showChats()">⬅</span>
+<span>Profile</span>
+</div>
+</div>
+<div class="messages">
+<p>👤 Ism: User</p>
+<p>📱 Status: Online</p>
+</div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div class="chat-window" id="settingsPage">
+<div class="chat-header">
+<div>
+<span class="back-btn" onclick="showChats()">⬅</span>
+<span>Settings</span>
+</div>
+</div>
+<div class="messages">
+<p>🔔 Notifications</p>
+<p>🔒 Privacy</p>
+<p>🌐 Language</p>
+</div>
 </div>
 
 <!-- CONFIRM -->
@@ -261,9 +287,9 @@ cursor:pointer;
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottomNav">
-<div class="nav-item active"><span>💬</span>Chats</div>
-<div class="nav-item"><span>👤</span>Profile</div>
-<div class="nav-item"><span>⚙</span>Settings</div>
+<div class="nav-item active" onclick="showChats()"><span>💬</span>Chats</div>
+<div class="nav-item" onclick="showProfile()"><span>👤</span>Profile</div>
+<div class="nav-item" onclick="showSettings()"><span>⚙</span>Settings</div>
 </div>
 
 <script>
@@ -274,18 +300,21 @@ currentChat=name;
 document.getElementById("chatTitle").innerText=name;
 document.getElementById("chatWindow").style.display="flex";
 document.getElementById("bottomNav").style.display="none";
+document.getElementById("mainPage").style.display="none";
+document.getElementById("mainHeader").style.display="none";
 loadMessages();
 }
 
 function closeChat(){
 document.getElementById("chatWindow").style.display="none";
 document.getElementById("bottomNav").style.display="flex";
+document.getElementById("mainPage").style.display="block";
+document.getElementById("mainHeader").style.display="block";
 }
 
 function sendMessage(){
 let input=document.getElementById("messageInput");
 if(input.value.trim()=="") return;
-
 let data=JSON.parse(localStorage.getItem(currentChat)||"[]");
 data.push({text:input.value});
 localStorage.setItem(currentChat,JSON.stringify(data));
@@ -297,8 +326,7 @@ function loadMessages(){
 let box=document.getElementById("messages");
 box.innerHTML="";
 let data=JSON.parse(localStorage.getItem(currentChat)||"[]");
-
-data.forEach((msg,i)=>{
+data.forEach((msg)=>{
 let div=document.createElement("div");
 div.className="message sent";
 div.innerHTML='<div class="select-circle"></div>'+msg.text;
@@ -329,6 +357,27 @@ function deleteAll(){
 localStorage.removeItem(currentChat);
 loadMessages();
 closeConfirm();
+}
+
+function showProfile(){
+document.getElementById("profilePage").style.display="flex";
+document.getElementById("mainPage").style.display="none";
+document.getElementById("mainHeader").style.display="none";
+}
+
+function showSettings(){
+document.getElementById("settingsPage").style.display="flex";
+document.getElementById("mainPage").style.display="none";
+document.getElementById("mainHeader").style.display="none";
+}
+
+function showChats(){
+document.getElementById("profilePage").style.display="none";
+document.getElementById("settingsPage").style.display="none";
+document.getElementById("chatWindow").style.display="none";
+document.getElementById("mainPage").style.display="block";
+document.getElementById("mainHeader").style.display="block";
+document.getElementById("bottomNav").style.display="flex";
 }
 </script>
 
