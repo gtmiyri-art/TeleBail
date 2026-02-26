@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleBail 2.0</title>
+<title>Bailgram 2.0</title>
 
 <style>
 body{
@@ -77,7 +77,6 @@ body{
   width:100%;
   height:100%;
   background:#111;
-  display:flex;
   flex-direction:column;
 }
 
@@ -86,13 +85,13 @@ body{
   background:#1c1c1c;
   display:flex;
   align-items:center;
+  font-weight:bold;
 }
 
 .back-btn{
   margin-right:15px;
   cursor:pointer;
   color:#ff4d6d;
-  font-weight:bold;
 }
 
 .messages{
@@ -190,7 +189,7 @@ body{
   <input type="text" id="searchInput" placeholder="Search...">
 </div>
 
-<div class="chat-list" id="chatList">
+<div class="chat-list">
 
   <div class="chat" onclick="openChat('AntiBail Bot')">
     <img src="https://i.pravatar.cc/150?img=12">
@@ -212,7 +211,7 @@ body{
 
 <!-- CHAT WINDOW -->
 <div class="chat-window" id="chatWindow">
-  
+
   <div class="chat-header">
     <div class="back-btn" onclick="closeChat()">⬅</div>
     <div id="chatTitle"></div>
@@ -228,7 +227,7 @@ body{
 </div>
 
 <!-- BOTTOM NAV -->
-<div class="bottom-nav">
+<div class="bottom-nav" id="bottomNav">
   <div class="nav-item active">💬</div>
   <div class="nav-item">👤</div>
   <div class="nav-item">⚙️</div>
@@ -243,11 +242,13 @@ function openChat(name){
   currentChat = name;
   document.getElementById("chatTitle").innerText = name;
   document.getElementById("chatWindow").style.display = "flex";
+  document.getElementById("bottomNav").style.display = "none";
   document.getElementById("messages").innerHTML = "";
 }
 
 function closeChat(){
   document.getElementById("chatWindow").style.display = "none";
+  document.getElementById("bottomNav").style.display = "flex";
 }
 
 function sendMessage(){
@@ -255,39 +256,35 @@ function sendMessage(){
   let text = input.value.trim();
   if(text === "") return;
 
-  addMessage(text, "sent");
-  input.value = "";
+  addMessage(text,"sent");
+  input.value="";
 
-  setTimeout(() => {
-    addMessage(getBotReply(text), "received");
-  }, 800);
+  setTimeout(()=>{
+    addMessage(getBotReply(text),"received");
+  },800);
 }
 
-function addMessage(text, type){
-  let msgDiv = document.createElement("div");
-  msgDiv.classList.add("message", type);
-  msgDiv.innerText = text;
-  document.getElementById("messages").appendChild(msgDiv);
-  document.getElementById("messages").scrollTop = 999999;
+function addMessage(text,type){
+  let msg=document.createElement("div");
+  msg.classList.add("message",type);
+  msg.innerText=text;
+  document.getElementById("messages").appendChild(msg);
+  document.getElementById("messages").scrollTop=999999;
 }
 
-function getBotReply(userText){
-  if(currentChat === "AntiBail Bot"){
+function getBotReply(text){
+  if(currentChat==="AntiBail Bot"){
     return "Rasmiy kod: 847392";
   }
-  if(currentChat === "BailPro Support"){
+  if(currentChat==="BailPro Support"){
     return "Appealingiz qabul qilindi.";
   }
-  return "Javob uchun rahmat!";
+  return "Rahmat!";
 }
 
-document.getElementById("searchInput").addEventListener("keyup", function(){
-  let filter = this.value.toLowerCase();
-  let chats = document.getElementsByClassName("chat");
-
-  for(let i=0;i<chats.length;i++){
-    let name = chats[i].innerText.toLowerCase();
-    chats[i].style.display = name.includes(filter) ? "" : "none";
+document.getElementById("messageInput").addEventListener("keypress",function(e){
+  if(e.key==="Enter"){
+    sendMessage();
   }
 });
 
