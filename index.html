@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,326 +9,238 @@
 body{
 margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#1e1b4b,#312e81);
+background:linear-gradient(to bottom,#1e1b4b,#312e81);
 color:white;
-overflow:hidden;
 }
 
 /* HEADER */
 .header{
-padding:15px;
+padding:20px;
 font-size:22px;
 font-weight:bold;
 }
 
 /* CHAT LIST */
-.page{
-padding:10px;
-padding-bottom:120px;
+.chat-list{
+padding:15px;
 }
 
-.chat{
-display:flex;
-align-items:center;
-padding:12px;
+.chat-item{
+background:#4338ca;
+padding:15px;
 border-radius:15px;
-background:rgba(255,255,255,0.08);
 margin-bottom:10px;
 cursor:pointer;
-}
-
-.chat img{
-width:45px;
-height:45px;
-border-radius:50%;
-margin-right:10px;
 }
 
 /* CHAT WINDOW */
 .chat-window{
 display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#111;
 flex-direction:column;
+height:100vh;
 }
 
 .chat-header{
+background:#111;
 padding:15px;
-background:#1c1c1c;
 display:flex;
 justify-content:space-between;
 align-items:center;
 }
 
-.back-btn{
-cursor:pointer;
-color:#ff4d6d;
-margin-right:10px;
-}
-
-.menu-btn{
-cursor:pointer;
-font-size:22px;
-}
-
 .messages{
 flex:1;
-padding:15px;
-overflow-y:auto;
+overflow:auto;
+padding:10px;
 }
 
-.message{
-position:relative;
-margin-bottom:10px;
-max-width:70%;
+.msg{
+background:#ff0066;
 padding:10px;
 border-radius:15px;
-font-size:14px;
-cursor:pointer;
+margin-bottom:8px;
+max-width:70%;
 }
 
-.sent{
-background:#ff0057;
-margin-left:auto;
-}
-
-.received{
-background:#333;
-}
-
-/* selection circle */
-.select-circle{
-position:absolute;
-left:-25px;
-top:50%;
-transform:translateY(-50%);
-width:15px;
-height:15px;
-border-radius:50%;
-background:white;
-display:none;
-}
-
-/* INPUT */
 .input-area{
 display:flex;
 padding:10px;
-background:#1c1c1c;
+background:#111;
 }
 
-.input-area input{
+input{
 flex:1;
 padding:10px;
-border:none;
 border-radius:20px;
-outline:none;
+border:none;
 }
 
-.send-btn{
-margin-left:10px;
-padding:10px 15px;
+button{
+background:#ff0066;
 border:none;
+color:white;
+padding:10px 15px;
 border-radius:20px;
-background:#ff0057;
+margin-left:5px;
+cursor:pointer;
+}
+
+/* BOTTOM MENU */
+.bottom{
+position:fixed;
+bottom:0;
+width:100%;
+background:#000;
+display:flex;
+justify-content:space-around;
+padding:10px;
+}
+
+.menu-btn{
 color:white;
 cursor:pointer;
 }
 
-/* BOTTOM NAV */
-.bottom-nav{
-position:fixed;
-bottom:15px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-height:70px;
-background:rgba(0,0,0,0.8);
-border-radius:30px;
-display:flex;
-justify-content:space-around;
-align-items:center;
-}
-
-.nav-item{
-display:flex;
-flex-direction:column;
-align-items:center;
-font-size:12px;
-cursor:pointer;
-opacity:0.7;
-}
-
-.nav-item span{
-font-size:22px;
-}
-
-.nav-item.active{
-opacity:1;
-}
-
-/* MENU BOX */
-.menu-box{
-position:absolute;
-top:60px;
-right:15px;
-background:#222;
-padding:10px;
-border-radius:10px;
+/* PROFILE */
+.profile{
 display:none;
-}
-
-.menu-box div{
-padding:8px;
-cursor:pointer;
-}
-
-.menu-box div:hover{
-background:#333;
-}
-
-/* CONFIRM BOX */
-.confirm-box{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#222;
 padding:20px;
-border-radius:15px;
-display:none;
+}
+
+.profile-card{
+background:#111;
+padding:20px;
+border-radius:20px;
 text-align:center;
 }
 
-.confirm-box button{
-margin:10px;
-padding:8px 15px;
-border:none;
-border-radius:10px;
-cursor:pointer;
+/* SETTINGS */
+.settings{
+display:none;
+padding:20px;
+}
+
+.setting-item{
+background:#111;
+padding:15px;
+border-radius:15px;
+margin-bottom:10px;
 }
 </style>
 </head>
+
 <body>
 
+<!-- CHAT LIST -->
+<div id="home">
 <div class="header">Bailgram Messages</div>
 
-<div class="page">
-<div class="chat" onclick="openChat('AntiBail Bot')">
-<img src="https://i.pravatar.cc/150?img=12">
-<div>AntiBail Bot</div>
-</div>
-
-<div class="chat" onclick="openChat('BailPro Support')">
-<img src="https://i.pravatar.cc/150?img=5">
-<div>BailPro Support</div>
+<div class="chat-list">
+<div class="chat-item" onclick="openChat('AntiBail Bot')">AntiBail Bot</div>
+<div class="chat-item" onclick="openChat('BailPro Support')">BailPro Support</div>
 </div>
 </div>
 
 <!-- CHAT WINDOW -->
 <div class="chat-window" id="chatWindow">
-
 <div class="chat-header">
-<div>
-<span class="back-btn" onclick="closeChat()">⬅</span>
-<span id="chatTitle"></span>
-</div>
-<div class="menu-btn" onclick="toggleMenu()">⋮</div>
-</div>
-
-<div class="menu-box" id="menuBox">
-<div onclick="confirmDelete()">Barcha xabarlarni o‘chirish</div>
+<span id="chatName"></span>
+<span onclick="toggleMenu()">⋮</span>
 </div>
 
 <div class="messages" id="messages"></div>
 
 <div class="input-area">
-<input type="text" id="messageInput" placeholder="Xabar yozing...">
-<button class="send-btn" onclick="sendMessage()">Yuborish</button>
+<input type="text" id="msgInput" placeholder="Xabar yozing...">
+<button onclick="sendMsg()">Yuborish</button>
+</div>
 </div>
 
+<!-- PROFILE -->
+<div class="profile" id="profile">
+<div class="profile-card">
+<h2>DARIK.WEB M1</h2>
+<p>Onlayn</p>
+<p>+998 90 123 45 67</p>
+</div>
 </div>
 
-<!-- CONFIRM -->
-<div class="confirm-box" id="confirmBox">
-<p>Haqiqatan ham o‘chirmoqchimisiz?</p>
-<button onclick="deleteAll()">Ha</button>
-<button onclick="closeConfirm()">Yo‘q</button>
+<!-- SETTINGS -->
+<div class="settings" id="settings">
+<div class="setting-item">Hisob</div>
+<div class="setting-item">Chat sozlamalari</div>
+<div class="setting-item">Maxfiylik va xavfsizlik</div>
+<div class="setting-item">Bildirishnomalar</div>
+<div class="setting-item">Til: O‘zbek</div>
 </div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav" id="bottomNav">
-<div class="nav-item active"><span>💬</span>Chats</div>
-<div class="nav-item"><span>👤</span>Profile</div>
-<div class="nav-item"><span>⚙</span>Settings</div>
+<!-- BOTTOM MENU -->
+<div class="bottom">
+<div class="menu-btn" onclick="goHome()">Chats</div>
+<div class="menu-btn" onclick="openProfile()">Profile</div>
+<div class="menu-btn" onclick="openSettings()">Settings</div>
 </div>
 
 <script>
 let currentChat="";
 
 function openChat(name){
-currentChat=name;
-document.getElementById("chatTitle").innerText=name;
+document.getElementById("home").style.display="none";
 document.getElementById("chatWindow").style.display="flex";
-document.getElementById("bottomNav").style.display="none";
-loadMessages();
+document.getElementById("chatName").innerText=name;
+currentChat=name;
 }
 
-function closeChat(){
+function goHome(){
+document.getElementById("home").style.display="block";
 document.getElementById("chatWindow").style.display="none";
-document.getElementById("bottomNav").style.display="flex";
+document.getElementById("profile").style.display="none";
+document.getElementById("settings").style.display="none";
 }
 
-function sendMessage(){
-let input=document.getElementById("messageInput");
-if(input.value.trim()=="") return;
-
-let data=JSON.parse(localStorage.getItem(currentChat)||"[]");
-data.push({text:input.value});
-localStorage.setItem(currentChat,JSON.stringify(data));
-input.value="";
-loadMessages();
+function openProfile(){
+goHome();
+document.getElementById("home").style.display="none";
+document.getElementById("profile").style.display="block";
 }
 
-function loadMessages(){
-let box=document.getElementById("messages");
-box.innerHTML="";
-let data=JSON.parse(localStorage.getItem(currentChat)||"[]");
+function openSettings(){
+goHome();
+document.getElementById("home").style.display="none";
+document.getElementById("settings").style.display="block";
+}
 
-data.forEach((msg,i)=>{
+function sendMsg(){
+let input=document.getElementById("msgInput");
+let text=input.value;
+if(text=="") return;
+
+let msgBox=document.getElementById("messages");
+
 let div=document.createElement("div");
-div.className="message sent";
-div.innerHTML='<div class="select-circle"></div>'+msg.text;
-div.onclick=function(){ toggleSelect(this); }
-box.appendChild(div);
-});
+div.className="msg";
+div.innerText=text;
+msgBox.appendChild(div);
+
+input.value="";
+
+setTimeout(()=>{
+let reply=document.createElement("div");
+reply.className="msg";
+
+if(text.toLowerCase()=="salom"){
+reply.innerText="Salom 👋\nRasmiy kod: 843565";
+}else{
+reply.innerText="Rasmiy kod: 843565";
 }
 
-function toggleSelect(el){
-let circle=el.querySelector(".select-circle");
-circle.style.display=circle.style.display=="block"?"none":"block";
+msgBox.appendChild(reply);
+msgBox.scrollTop=msgBox.scrollHeight;
+},800);
 }
 
 function toggleMenu(){
-let m=document.getElementById("menuBox");
-m.style.display=m.style.display=="block"?"none":"block";
-}
-
-function confirmDelete(){
-document.getElementById("confirmBox").style.display="block";
-}
-
-function closeConfirm(){
-document.getElementById("confirmBox").style.display="none";
-}
-
-function deleteAll(){
-localStorage.removeItem(currentChat);
-loadMessages();
-closeConfirm();
+alert("Chat ma'lumotlari ochildi ✅");
 }
 </script>
 
