@@ -13,14 +13,17 @@ background:linear-gradient(to bottom,#1e1b4b,#312e81);
 color:white;
 }
 
-/* HEADER */
+/* HOME */
+#home{
+padding-bottom:70px;
+}
+
 .header{
 padding:20px;
 font-size:22px;
 font-weight:bold;
 }
 
-/* CHAT LIST */
 .chat-list{
 padding:15px;
 }
@@ -38,6 +41,7 @@ cursor:pointer;
 display:none;
 flex-direction:column;
 height:100vh;
+padding-bottom:120px;
 }
 
 .chat-header{
@@ -46,12 +50,14 @@ padding:15px;
 display:flex;
 justify-content:space-between;
 align-items:center;
+font-weight:bold;
 }
 
 .messages{
 flex:1;
-overflow:auto;
-padding:10px;
+overflow-y:auto;
+padding:15px;
+margin-bottom:10px;
 }
 
 .msg{
@@ -60,12 +66,16 @@ padding:10px;
 border-radius:15px;
 margin-bottom:8px;
 max-width:70%;
+word-wrap:break-word;
 }
 
 .input-area{
 display:flex;
 padding:10px;
 background:#111;
+position:fixed;
+bottom:60px;
+width:100%;
 }
 
 input{
@@ -73,6 +83,7 @@ flex:1;
 padding:10px;
 border-radius:20px;
 border:none;
+outline:none;
 }
 
 button{
@@ -85,31 +96,16 @@ margin-left:5px;
 cursor:pointer;
 }
 
-/* BOTTOM MENU */
-.bottom{
-position:fixed;
-bottom:0;
-width:100%;
-background:#000;
-display:flex;
-justify-content:space-around;
-padding:10px;
-}
-
-.menu-btn{
-color:white;
-cursor:pointer;
-}
-
 /* PROFILE */
 .profile{
 display:none;
 padding:20px;
+padding-bottom:80px;
 }
 
 .profile-card{
 background:#111;
-padding:20px;
+padding:30px;
 border-radius:20px;
 text-align:center;
 }
@@ -118,6 +114,7 @@ text-align:center;
 .settings{
 display:none;
 padding:20px;
+padding-bottom:80px;
 }
 
 .setting-item{
@@ -126,12 +123,28 @@ padding:15px;
 border-radius:15px;
 margin-bottom:10px;
 }
+
+/* BOTTOM MENU */
+.bottom{
+position:fixed;
+bottom:0;
+width:100%;
+background:#000;
+display:flex;
+justify-content:space-around;
+padding:15px 0;
+}
+
+.menu-btn{
+color:white;
+cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
-<!-- CHAT LIST -->
+<!-- HOME -->
 <div id="home">
 <div class="header">Bailgram Messages</div>
 
@@ -141,7 +154,7 @@ margin-bottom:10px;
 </div>
 </div>
 
-<!-- CHAT WINDOW -->
+<!-- CHAT -->
 <div class="chat-window" id="chatWindow">
 <div class="chat-header">
 <span id="chatName"></span>
@@ -174,7 +187,7 @@ margin-bottom:10px;
 <div class="setting-item">Til: O‘zbek</div>
 </div>
 
-<!-- BOTTOM MENU -->
+<!-- BOTTOM -->
 <div class="bottom">
 <div class="menu-btn" onclick="goHome()">Chats</div>
 <div class="menu-btn" onclick="openProfile()">Profile</div>
@@ -186,8 +199,11 @@ let currentChat="";
 
 function openChat(name){
 document.getElementById("home").style.display="none";
+document.getElementById("profile").style.display="none";
+document.getElementById("settings").style.display="none";
 document.getElementById("chatWindow").style.display="flex";
 document.getElementById("chatName").innerText=name;
+document.getElementById("messages").innerHTML="";
 currentChat=name;
 }
 
@@ -212,8 +228,8 @@ document.getElementById("settings").style.display="block";
 
 function sendMsg(){
 let input=document.getElementById("msgInput");
-let text=input.value;
-if(text=="") return;
+let text=input.value.trim();
+if(text==="") return;
 
 let msgBox=document.getElementById("messages");
 
@@ -223,6 +239,7 @@ div.innerText=text;
 msgBox.appendChild(div);
 
 input.value="";
+msgBox.scrollTop=msgBox.scrollHeight;
 
 setTimeout(()=>{
 let reply=document.createElement("div");
@@ -236,11 +253,11 @@ reply.innerText="Rasmiy kod: 843565";
 
 msgBox.appendChild(reply);
 msgBox.scrollTop=msgBox.scrollHeight;
-},800);
+},700);
 }
 
 function toggleMenu(){
-alert("Chat ma'lumotlari ochildi ✅");
+alert("Chat ma'lumotlari\nTozalash\nBloklash\nYopish");
 }
 </script>
 
