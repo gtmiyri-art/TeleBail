@@ -2,18 +2,18 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>WarTest 3D</title>
+<title>Dust Arena Test</title>
 <style>
-body { margin: 0; overflow: hidden; }
-#shootBtn {
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
-  width: 80px;
-  height: 80px;
-  background: red;
-  border-radius: 50%;
-  opacity: 0.7;
+body { margin:0; overflow:hidden; background:#000; }
+#shootBtn{
+position:fixed;
+bottom:30px;
+right:30px;
+width:80px;
+height:80px;
+background:red;
+border-radius:50%;
+opacity:0.7;
 }
 </style>
 </head>
@@ -25,50 +25,74 @@ body { margin: 0; overflow: hidden; }
 
 <script>
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xc2b280);
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// Light
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(10,20,10);
+scene.add(light);
+
 // Floor
-const floorGeo = new THREE.BoxGeometry(50,1,50);
-const floorMat = new THREE.MeshBasicMaterial({color: 0x888888});
-const floor = new THREE.Mesh(floorGeo, floorMat);
+const floorGeo = new THREE.BoxGeometry(60,1,60);
+const floorMat = new THREE.MeshLambertMaterial({color:0xd2b48c});
+const floor = new THREE.Mesh(floorGeo,floorMat);
 floor.position.y = -1;
 scene.add(floor);
 
-// Wall
-const wallGeo = new THREE.BoxGeometry(5,5,1);
-const wallMat = new THREE.MeshBasicMaterial({color: 0x3333ff});
-const wall = new THREE.Mesh(wallGeo, wallMat);
-wall.position.z = -10;
-scene.add(wall);
+// Wall material
+const wallMat = new THREE.MeshLambertMaterial({color:0xedc9af});
 
-// Player (camera)
-camera.position.z = 5;
+// Function to create wall
+function createWall(x,y,z,w,h,d){
+const geo = new THREE.BoxGeometry(w,h,d);
+const mesh = new THREE.Mesh(geo,wallMat);
+mesh.position.set(x,y,z);
+scene.add(mesh);
+}
 
-// Shoot
-document.getElementById("shootBtn").addEventListener("click", () => {
-  const bulletGeo = new THREE.SphereGeometry(0.2);
-  const bulletMat = new THREE.MeshBasicMaterial({color: 0xffff00});
-  const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-  bullet.position.set(camera.position.x, camera.position.y, camera.position.z);
-  scene.add(bullet);
+// Outer walls
+createWall(0,2,-30,60,5,1);
+createWall(0,2,30,60,5,1);
+createWall(-30,2,0,1,5,60);
+createWall(30,2,0,1,5,60);
 
-  function moveBullet(){
-    bullet.position.z -= 0.5;
-    if(bullet.position.z < -50){
-      scene.remove(bullet);
-    } else {
-      requestAnimationFrame(moveBullet);
-    }
-  }
-  moveBullet();
+// Middle blocks (dust style lanes)
+createWall(-10,2,0,5,5,20);
+createWall(10,2,0,5,5,20);
+
+// Boxes
+createWall(-5,1,15,3,3,3);
+createWall(8,1,-12,3,3,3);
+
+camera.position.set(0,2,20);
+
+// Simple shoot
+document.getElementById("shootBtn").addEventListener("click",()=>{
+const bulletGeo = new THREE.SphereGeometry(0.2);
+const bulletMat = new THREE.MeshBasicMaterial({color:0xffff00});
+const bullet = new THREE.Mesh(bulletGeo,bulletMat);
+bullet.position.copy(camera.position);
+scene.add(bullet);
+
+function move(){
+bullet.position.z -= 0.7;
+if(bullet.position.z < -50){
+scene.remove(bullet);
+}else{
+requestAnimationFrame(move);
+}
+}
+move();
 });
 
 function animate(){
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
+requestAnimationFrame(animate);
+renderer.render(scene,camera);
 }
 animate();
 </script>
