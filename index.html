@@ -2,99 +2,68 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dust Arena Test</title>
+<title>Mini FPS</title>
 <style>
-body { margin:0; overflow:hidden; background:#000; }
-#shootBtn{
+body { margin:0; overflow:hidden; background:black; }
+#shootBtn {
 position:fixed;
-bottom:30px;
-right:30px;
+right:20px;
+bottom:40px;
 width:80px;
 height:80px;
-background:red;
 border-radius:50%;
-opacity:0.7;
+background:red;
+color:white;
+font-size:20px;
+border:none;
 }
 </style>
 </head>
 <body>
 
-<div id="shootBtn"></div>
+<button id="shootBtn">FIRE</button>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 <script>
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xc2b280);
-
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Light
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(10,20,10);
-scene.add(light);
+// Yer
+let planeGeo = new THREE.PlaneGeometry(100,100);
+let planeMat = new THREE.MeshBasicMaterial({color:0x8B4513});
+let plane = new THREE.Mesh(planeGeo, planeMat);
+plane.rotation.x = -Math.PI/2;
+scene.add(plane);
 
-// Floor
-const floorGeo = new THREE.BoxGeometry(60,1,60);
-const floorMat = new THREE.MeshLambertMaterial({color:0xd2b48c});
-const floor = new THREE.Mesh(floorGeo,floorMat);
-floor.position.y = -1;
-scene.add(floor);
+// Dushman kub
+let enemyGeo = new THREE.BoxGeometry(2,2,2);
+let enemyMat = new THREE.MeshBasicMaterial({color:0x0000ff});
+let enemy = new THREE.Mesh(enemyGeo, enemyMat);
+enemy.position.set(0,1,-10);
+scene.add(enemy);
 
-// Wall material
-const wallMat = new THREE.MeshLambertMaterial({color:0xedc9af});
-
-// Function to create wall
-function createWall(x,y,z,w,h,d){
-const geo = new THREE.BoxGeometry(w,h,d);
-const mesh = new THREE.Mesh(geo,wallMat);
-mesh.position.set(x,y,z);
-scene.add(mesh);
-}
-
-// Outer walls
-createWall(0,2,-30,60,5,1);
-createWall(0,2,30,60,5,1);
-createWall(-30,2,0,1,5,60);
-createWall(30,2,0,1,5,60);
-
-// Middle blocks (dust style lanes)
-createWall(-10,2,0,5,5,20);
-createWall(10,2,0,5,5,20);
-
-// Boxes
-createWall(-5,1,15,3,3,3);
-createWall(8,1,-12,3,3,3);
-
-camera.position.set(0,2,20);
-
-// Simple shoot
-document.getElementById("shootBtn").addEventListener("click",()=>{
-const bulletGeo = new THREE.SphereGeometry(0.2);
-const bulletMat = new THREE.MeshBasicMaterial({color:0xffff00});
-const bullet = new THREE.Mesh(bulletGeo,bulletMat);
-bullet.position.copy(camera.position);
-scene.add(bullet);
-
-function move(){
-bullet.position.z -= 0.7;
-if(bullet.position.z < -50){
-scene.remove(bullet);
-}else{
-requestAnimationFrame(move);
-}
-}
-move();
-});
+camera.position.y = 2;
 
 function animate(){
 requestAnimationFrame(animate);
 renderer.render(scene,camera);
 }
 animate();
+
+// Otish
+document.getElementById("shootBtn").onclick = function(){
+let raycaster = new THREE.Raycaster();
+raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
+let hits = raycaster.intersectObjects([enemy]);
+if(hits.length > 0){
+enemy.material.color.set(0xff0000);
+alert("Enemy Hit!");
+}
+}
 </script>
 
 </body>
