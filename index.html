@@ -1,83 +1,1276 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>CoinVault</title>
-<style>
-body{
-font-family:Arial;
-background:#f5f5f5;
-text-align:center;
-}
+const ComponentFunction = function() {
+  // @section:imports @depends:[]
+  const React = require('react');
+  const { useState, useEffect, useContext, useMemo, useCallback } = React;
+  const { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, Alert, Platform, StatusBar, ActivityIndicator, FlatList } = require('react-native');
+  const { MaterialIcons } = require('@expo/vector-icons');
+  const { createBottomTabNavigator } = require('@react-navigation/bottom-tabs');
+  const { useSafeAreaInsets } = require('react-native-safe-area-context');
+  const { useQuery, useMutation } = require('platform-hooks');
+  // @end:imports
 
-.header{
-background:#FFD700;
-padding:15px;
-font-size:24px;
-font-weight:bold;
-}
+  // @section:constants @depends:[]
+  var TAB_BAR_HEIGHT = Platform.OS === 'web' ? 56 : 49;
+  var SCROLL_EXTRA_PADDING = 16;
+  var WEB_TAB_BAR_PADDING = 90;
+  var FAB_SPACING = 16;
+  // @end:constants
 
-.coin{
-font-size:22px;
-margin:20px;
-}
+  // @section:theme @depends:[]
+  const storageStrategy = 'all-local';
+  const primaryColor = '#F59E0B';
+  const accentColor = '#EF4444';
+  const backgroundColor = '#FEF3C7';
+  const cardColor = '#FFFFFF';
+  const textPrimary = '#1F2937';
+  const textSecondary = '#6B7280';
+  const designStyle = 'playful';
+  // @end:theme
 
-button{
-width:200px;
-padding:15px;
-margin:10px;
-font-size:18px;
-border:none;
-border-radius:10px;
-background:#FFD700;
-}
+  // @section:navigation-setup @depends:[]
+  const Tab = createBottomTabNavigator();
+  // @end:navigation-setup
 
-.redeem{
-background:#4CAF50;
-color:white;
-}
+  // @section:ThemeContext @depends:[theme]
+  const ThemeContext = React.createContext();
+  const ThemeProvider = function(props) {
+    const darkModeState = useState(false);
+    const darkMode = darkModeState[0];
+    const setDarkMode = darkModeState[1];
+    
+    const lightTheme = useMemo(function() {
+      return {
+        colors: {
+          primary: primaryColor,
+          accent: accentColor,
+          background: backgroundColor,
+          card: cardColor,
+          textPrimary: textPrimary,
+          textSecondary: textSecondary,
+          border: '#E5E7EB',
+          success: '#10B981',
+          error: '#EF4444',
+          warning: '#F59E0B'
+        }
+      };
+    }, []);
+    
+    const darkTheme = useMemo(function() {
+      return {
+        colors: {
+          primary: primaryColor,
+          accent: accentColor,
+          background: '#1F2937',
+          card: '#374151',
+          textPrimary: '#F9FAFB',
+          textSecondary: '#D1D5DB',
+          border: '#4B5563',
+          success: '#10B981',
+          error: '#EF4444',
+          warning: '#F59E0B'
+        }
+      };
+    }, []);
+    
+    const theme = darkMode ? darkTheme : lightTheme;
+    
+    const toggleDarkMode = useCallback(function() {
+      setDarkMode(function(prev) { return !prev; });
+    }, []);
+    
+    const value = useMemo(function() {
+      return { theme: theme, darkMode: darkMode, toggleDarkMode: toggleDarkMode, designStyle: designStyle };
+    }, [theme, darkMode, toggleDarkMode]);
+    
+    return React.createElement(ThemeContext.Provider, { value: value }, props.children);
+  };
+  
+  const useTheme = function() { return useContext(ThemeContext); };
+  // @end:ThemeContext
 
-</style>
-</head>
+  // @section:HomeScreen-state @depends:[ThemeContext]
+  const useHomeScreenState = function() {
+    const themeContext = useTheme();
+    const theme = themeContext.theme;
+    const { data: gameAttempts, loading: attemptsLoading, refetch: refetchAttempts } = useQuery('GameAttempt');
+    const { data: redeemLogs, loading: redeemsLoading, refetch: refetchRedeems } = useQuery('RedeemLog');
+    
+    const totalCoins = useMemo(function() {
+      if (!gameAttempts || !redeemLogs) return 0;
+      const earned = gameAttempts.reduce(function(sum, attempt) {
+        return sum + (attempt.coinsEarned || 0);
+      }, 0);
+      const spent = redeemLogs.reduce(function(sum, redeem) {
+        return sum + (redeem.coinsSpent || 0);
+      }, 0);
+      return earned - spent;
+    }, [gameAttempts, redeemLogs]);
+    
+    return { 
+      theme: theme, 
+      totalCoins: totalCoins, 
+      loading: attemptsLoading || redeemsLoading,
+      refetchAttempts: refetchAttempts,
+      refetchRedeems: refetchRedeems
+    };
+  };
+  // @end:HomeScreen-state
 
-<body>
+  // @section:HomeScreen-GameModal @depends:[styles]
+  const GameModal = function(props) {
+    const visible = props.visible;
+    const gameType = props.gameType;
+    const onClose = props.onClose;
+    const onSuccess = props.onSuccess;
+    const theme = props.theme;
+    const insetsTop = props.insetsTop;
+    const insetsBottom = props.insetsBottom;
+    
+    const gameStateMap = useState({
+      puzzle: { currentStep: 0, solved: false },
+      flag: { selectedAnswer: null, correctAnswer: 2 },
+      color: { selectedColor: null, correctColor: '#FF0000' }
+    });
+    const gameState = gameStateMap[0];
+    const setGameState = gameStateMap[1];
+    
+    const puzzleSteps = ['Connect the dots', 'Match the pattern', 'Complete the sequence'];
+    const flagOptions = ['Brazil', 'Germany', 'Japan', 'Canada'];
+    const colorOptions = [
+      { name: 'Red', value: '#FF0000' },
+      { name: 'Blue', value: '#0000FF' },
+      { name: 'Green', value: '#00FF00' },
+      { name: 'Yellow', value: '#FFFF00' }
+    ];
+    
+    const handleGameAction = function(action, value) {
+      if (gameType === 'puzzle') {
+        if (action === 'next') {
+          const currentGame = gameState.puzzle;
+          if (currentGame.currentStep < puzzleSteps.length - 1) {
+            setGameState(function(prev) {
+              return Object.assign({}, prev, {
+                puzzle: Object.assign({}, prev.puzzle, { currentStep: prev.puzzle.currentStep + 1 })
+              });
+            });
+          } else {
+            setGameState(function(prev) {
+              return Object.assign({}, prev, {
+                puzzle: Object.assign({}, prev.puzzle, { solved: true })
+              });
+            });
+            onSuccess();
+          }
+        }
+      } else if (gameType === 'flag') {
+        if (action === 'select') {
+          setGameState(function(prev) {
+            return Object.assign({}, prev, {
+              flag: Object.assign({}, prev.flag, { selectedAnswer: value })
+            });
+          });
+        } else if (action === 'submit') {
+          if (gameState.flag.selectedAnswer === gameState.flag.correctAnswer) {
+            onSuccess();
+          } else {
+            Platform.OS === 'web' ? window.alert('Wrong Answer! Try again.') : Alert.alert('Wrong Answer', 'Try again.');
+          }
+        }
+      } else if (gameType === 'color') {
+        if (action === 'select') {
+          setGameState(function(prev) {
+            return Object.assign({}, prev, {
+              color: Object.assign({}, prev.color, { selectedColor: value })
+            });
+          });
+        } else if (action === 'submit') {
+          if (gameState.color.selectedColor === gameState.color.correctColor) {
+            onSuccess();
+          } else {
+            Platform.OS === 'web' ? window.alert('Wrong Color! Try again.') : Alert.alert('Wrong Color', 'Try again.');
+          }
+        }
+      }
+    };
+    
+    const renderPuzzleGame = function() {
+      const currentGame = gameState.puzzle;
+      return React.createElement(View, { style: styles.gameContent, componentId: 'puzzle-game' },
+        React.createElement(Text, { 
+          style: [styles.gameTitle, { color: theme.colors.textPrimary }], 
+          componentId: 'puzzle-title' 
+        }, 'Visual Puzzle'),
+        React.createElement(View, { style: styles.puzzleContainer, componentId: 'puzzle-container' },
+          React.createElement(Text, { 
+            style: [styles.puzzleStep, { color: theme.colors.textSecondary }], 
+            componentId: 'puzzle-step' 
+          }, 'Step ' + (currentGame.currentStep + 1) + ' of ' + puzzleSteps.length),
+          React.createElement(Text, { 
+            style: [styles.puzzleInstruction, { color: theme.colors.textPrimary }], 
+            componentId: 'puzzle-instruction' 
+          }, puzzleSteps[currentGame.currentStep]),
+          React.createElement(View, { style: styles.puzzleVisual, componentId: 'puzzle-visual' },
+            React.createElement(View, { 
+              style: [styles.puzzleDot, { backgroundColor: theme.colors.primary }], 
+              componentId: 'puzzle-dot-1' 
+            }),
+            React.createElement(View, { 
+              style: [styles.puzzleDot, { backgroundColor: theme.colors.accent }], 
+              componentId: 'puzzle-dot-2' 
+            }),
+            React.createElement(View, { 
+              style: [styles.puzzleDot, { backgroundColor: theme.colors.success }], 
+              componentId: 'puzzle-dot-3' 
+            })
+          )
+        ),
+        React.createElement(TouchableOpacity, {
+          style: [styles.gameButton, { backgroundColor: theme.colors.primary }],
+          onPress: function() { handleGameAction('next'); },
+          componentId: 'puzzle-next-button'
+        },
+          React.createElement(Text, { style: styles.gameButtonText, componentId: 'puzzle-button-text' }, 
+            currentGame.currentStep === puzzleSteps.length - 1 ? 'Complete' : 'Next Step'
+          )
+        )
+      );
+    };
+    
+    const renderFlagGame = function() {
+      const currentGame = gameState.flag;
+      return React.createElement(View, { style: styles.gameContent, componentId: 'flag-game' },
+        React.createElement(Text, { 
+          style: [styles.gameTitle, { color: theme.colors.textPrimary }], 
+          componentId: 'flag-title' 
+        }, 'Flag Quiz'),
+        React.createElement(View, { style: styles.flagContainer, componentId: 'flag-container' },
+          React.createElement(Text, { 
+            style: [styles.flagQuestion, { color: theme.colors.textPrimary }], 
+            componentId: 'flag-question' 
+          }, 'Which country does this flag belong to?'),
+          React.createElement(View, { style: styles.flagImage, componentId: 'flag-image' },
+            React.createElement(Text, { style: styles.flagEmoji, componentId: 'flag-emoji' }, '🇯🇵')
+          ),
+          React.createElement(View, { style: styles.flagOptions, componentId: 'flag-options' },
+            flagOptions.map(function(option, index) {
+              const isSelected = currentGame.selectedAnswer === index;
+              return React.createElement(TouchableOpacity, {
+                key: index,
+                style: [
+                  styles.flagOption, 
+                  { backgroundColor: isSelected ? theme.colors.primary : theme.colors.card },
+                  { borderColor: theme.colors.border }
+                ],
+                onPress: function() { handleGameAction('select', index); },
+                componentId: 'flag-option-' + index
+              },
+                React.createElement(Text, { 
+                  style: [
+                    styles.flagOptionText, 
+                    { color: isSelected ? '#FFFFFF' : theme.colors.textPrimary }
+                  ], 
+                  componentId: 'flag-option-text-' + index 
+                }, option)
+              );
+            })
+          )
+        ),
+        React.createElement(TouchableOpacity, {
+          style: [
+            styles.gameButton, 
+            { backgroundColor: currentGame.selectedAnswer !== null ? theme.colors.primary : theme.colors.border }
+          ],
+          onPress: function() { handleGameAction('submit'); },
+          disabled: currentGame.selectedAnswer === null,
+          componentId: 'flag-submit-button'
+        },
+          React.createElement(Text, { style: styles.gameButtonText, componentId: 'flag-submit-text' }, 'Submit Answer')
+        )
+      );
+    };
+    
+    const renderColorGame = function() {
+      const currentGame = gameState.color;
+      return React.createElement(View, { style: styles.gameContent, componentId: 'color-game' },
+        React.createElement(Text, { 
+          style: [styles.gameTitle, { color: theme.colors.textPrimary }], 
+          componentId: 'color-title' 
+        }, 'Color Challenge'),
+        React.createElement(View, { style: styles.colorContainer, componentId: 'color-container' },
+          React.createElement(Text, { 
+            style: [styles.colorQuestion, { color: theme.colors.textPrimary }], 
+            componentId: 'color-question' 
+          }, 'Select the color: RED'),
+          React.createElement(View, { style: styles.colorOptions, componentId: 'color-options' },
+            colorOptions.map(function(option, index) {
+              const isSelected = currentGame.selectedColor === option.value;
+              return React.createElement(TouchableOpacity, {
+                key: index,
+                style: [
+                  styles.colorOption, 
+                  { backgroundColor: option.value },
+                  { borderWidth: isSelected ? 4 : 2, borderColor: isSelected ? theme.colors.textPrimary : theme.colors.border }
+                ],
+                onPress: function() { handleGameAction('select', option.value); },
+                componentId: 'color-option-' + index
+              },
+                React.createElement(Text, { 
+                  style: [styles.colorOptionText, { color: '#FFFFFF' }], 
+                  componentId: 'color-option-text-' + index 
+                }, option.name)
+              );
+            })
+          )
+        ),
+        React.createElement(TouchableOpacity, {
+          style: [
+            styles.gameButton, 
+            { backgroundColor: currentGame.selectedColor !== null ? theme.colors.primary : theme.colors.border }
+          ],
+          onPress: function() { handleGameAction('submit'); },
+          disabled: currentGame.selectedColor === null,
+          componentId: 'color-submit-button'
+        },
+          React.createElement(Text, { style: styles.gameButtonText, componentId: 'color-submit-text' }, 'Submit Answer')
+        )
+      );
+    };
+    
+    return React.createElement(Modal, {
+      visible: visible,
+      animationType: 'slide',
+      presentationStyle: 'pageSheet',
+      transparent: true,
+      onRequestClose: onClose
+    },
+      React.createElement(View, {
+        style: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', marginTop: insetsTop },
+        componentId: 'game-modal-overlay'
+      },
+        React.createElement(View, {
+          style: {
+            flex: 1,
+            maxHeight: '90%',
+            marginHorizontal: 20,
+            backgroundColor: theme.colors.background,
+            borderRadius: 24,
+            padding: 20,
+            paddingBottom: insetsBottom + 20
+          },
+          componentId: 'game-modal-content'
+        },
+          React.createElement(View, { style: styles.gameHeader, componentId: 'game-header' },
+            React.createElement(TouchableOpacity, {
+              style: [styles.closeButton, { backgroundColor: theme.colors.card }],
+              onPress: onClose,
+              componentId: 'game-close-button'
+            },
+              React.createElement(MaterialIcons, { name: 'close', size: 24, color: theme.colors.textPrimary })
+            )
+          ),
+          React.createElement(ScrollView, { style: { flex: 1 }, componentId: 'game-scroll' },
+            gameType === 'puzzle' ? renderPuzzleGame() :
+            gameType === 'flag' ? renderFlagGame() :
+            gameType === 'color' ? renderColorGame() : null
+          )
+        )
+      )
+    );
+  };
+  // @end:HomeScreen-GameModal
 
-<div class="header">CoinVault</div>
+  // @section:HomeScreen @depends:[HomeScreen-state,HomeScreen-GameModal,styles]
+  const HomeScreen = function() {
+    const state = useHomeScreenState();
+    const insets = useSafeAreaInsets();
+    const scrollBottomPadding = Platform.OS === 'web' ? WEB_TAB_BAR_PADDING : (TAB_BAR_HEIGHT + insets.bottom + SCROLL_EXTRA_PADDING);
+    const scrollTopPadding = insets.top;
+    
+    const { mutate: insertGameAttempt } = useMutation('GameAttempt', 'insert');
+    
+    const showGameModalState = useState(null);
+    const showGameModal = showGameModalState[0];
+    const setShowGameModal = showGameModalState[1];
+    
+    const handleGameSuccess = function(gameType) {
+      const attemptData = {
+        gameType: gameType,
+        coinsEarned: 10,
+        timestamp: new Date().toISOString()
+      };
+      
+      insertGameAttempt(attemptData)
+        .then(function() {
+          state.refetchAttempts();
+          setShowGameModal(null);
+          Platform.OS === 'web' ? window.alert('Correct! +10 Coins earned!') : Alert.alert('Success', 'Correct! +10 Coins earned!');
+        })
+        .catch(function(error) {
+          Platform.OS === 'web' ? window.alert(error.message) : Alert.alert('Error', error.message);
+        });
+    };
+    
+    if (state.loading) {
+      return React.createElement(View, { style: [styles.loadingContainer, { backgroundColor: state.theme.colors.background }], componentId: 'home-loading' },
+        React.createElement(ActivityIndicator, { size: 'large', color: state.theme.colors.primary, componentId: 'loading-indicator' })
+      );
+    }
+    
+    return React.createElement(ScrollView, {
+      style: { flex: 1, backgroundColor: state.theme.colors.background },
+      contentContainerStyle: { paddingTop: scrollTopPadding, paddingBottom: scrollBottomPadding },
+      componentId: 'home-scroll'
+    },
+      React.createElement(View, { style: styles.header, componentId: 'home-header' },
+        React.createElement(Text, { 
+          style: [styles.appTitle, { color: state.theme.colors.textPrimary }], 
+          componentId: 'app-title' 
+        }, 'CoinValet'),
+        React.createElement(Text, { 
+          style: [styles.appSubtitle, { color: state.theme.colors.textSecondary }], 
+          componentId: 'app-subtitle' 
+        }, 'Earn coins by playing games!')
+      ),
+      
+      React.createElement(View, { style: [styles.coinCard, { backgroundColor: state.theme.colors.card }], componentId: 'coin-balance-card' },
+        React.createElement(MaterialIcons, { name: 'monetization-on', size: 48, color: state.theme.colors.primary }),
+        React.createElement(Text, { 
+          style: [styles.coinBalance, { color: state.theme.colors.textPrimary }], 
+          componentId: 'coin-balance' 
+        }, state.totalCoins + ' Coins'),
+        React.createElement(Text, { 
+          style: [styles.coinSubtext, { color: state.theme.colors.textSecondary }], 
+          componentId: 'coin-subtext' 
+        }, 'Play games to earn more!')
+      ),
+      
+      React.createElement(View, { style: styles.gamesSection, componentId: 'games-section' },
+        React.createElement(Text, { 
+          style: [styles.sectionTitle, { color: state.theme.colors.textPrimary }], 
+          componentId: 'games-title' 
+        }, 'Mini Games'),
+        
+        React.createElement(TouchableOpacity, {
+          style: [styles.gameCard, { backgroundColor: state.theme.colors.card }],
+          onPress: function() { setShowGameModal('puzzle'); },
+          componentId: 'puzzle-game-card'
+        },
+          React.createElement(MaterialIcons, { name: 'extension', size: 32, color: state.theme.colors.primary }),
+          React.createElement(View, { style: styles.gameCardContent, componentId: 'puzzle-card-content' },
+            React.createElement(Text, { 
+              style: [styles.gameCardTitle, { color: state.theme.colors.textPrimary }], 
+              componentId: 'puzzle-card-title' 
+            }, 'Visual Puzzle'),
+            React.createElement(Text, { 
+              style: [styles.gameCardDescription, { color: state.theme.colors.textSecondary }], 
+              componentId: 'puzzle-card-description' 
+            }, 'Complete visual challenges and earn 10 coins')
+          ),
+          React.createElement(MaterialIcons, { name: 'chevron-right', size: 24, color: state.theme.colors.textSecondary })
+        ),
+        
+        React.createElement(TouchableOpacity, {
+          style: [styles.gameCard, { backgroundColor: state.theme.colors.card }],
+          onPress: function() { setShowGameModal('flag'); },
+          componentId: 'flag-game-card'
+        },
+          React.createElement(MaterialIcons, { name: 'flag', size: 32, color: state.theme.colors.accent }),
+          React.createElement(View, { style: styles.gameCardContent, componentId: 'flag-card-content' },
+            React.createElement(Text, { 
+              style: [styles.gameCardTitle, { color: state.theme.colors.textPrimary }], 
+              componentId: 'flag-card-title' 
+            }, 'Flag Quiz'),
+            React.createElement(Text, { 
+              style: [styles.gameCardDescription, { color: state.theme.colors.textSecondary }], 
+              componentId: 'flag-card-description' 
+            }, 'Guess the country flag and earn 10 coins')
+          ),
+          React.createElement(MaterialIcons, { name: 'chevron-right', size: 24, color: state.theme.colors.textSecondary })
+        ),
+        
+        React.createElement(TouchableOpacity, {
+          style: [styles.gameCard, { backgroundColor: state.theme.colors.card }],
+          onPress: function() { setShowGameModal('color'); },
+          componentId: 'color-game-card'
+        },
+          React.createElement(MaterialIcons, { name: 'palette', size: 32, color: state.theme.colors.success }),
+          React.createElement(View, { style: styles.gameCardContent, componentId: 'color-card-content' },
+            React.createElement(Text, { 
+              style: [styles.gameCardTitle, { color: state.theme.colors.textPrimary }], 
+              componentId: 'color-card-title' 
+            }, 'Color Challenge'),
+            React.createElement(Text, { 
+              style: [styles.gameCardDescription, { color: state.theme.colors.textSecondary }], 
+              componentId: 'color-card-description' 
+            }, 'Pick the correct color and earn 10 coins')
+          ),
+          React.createElement(MaterialIcons, { name: 'chevron-right', size: 24, color: state.theme.colors.textSecondary })
+        )
+      ),
+      
+      showGameModal ? React.createElement(GameModal, {
+        visible: showGameModal !== null,
+        gameType: showGameModal,
+        onClose: function() { setShowGameModal(null); },
+        onSuccess: function() { handleGameSuccess(showGameModal); },
+        theme: state.theme,
+        insetsTop: insets.top,
+        insetsBottom: insets.bottom
+      }) : null
+    );
+  };
+  // @end:HomeScreen
 
-<div class="coin">
-Coins: <span id="coin">0</span>
-</div>
+  // @section:RedeemScreen @depends:[ThemeContext,styles]
+  const RedeemScreen = function() {
+    const themeContext = useTheme();
+    const theme = themeContext.theme;
+    const insets = useSafeAreaInsets();
+    const scrollBottomPadding = Platform.OS === 'web' ? WEB_TAB_BAR_PADDING : (TAB_BAR_HEIGHT + insets.bottom + SCROLL_EXTRA_PADDING);
+    const scrollTopPadding = insets.top;
+    
+    const { data: gameAttempts, loading: attemptsLoading, refetch: refetchAttempts } = useQuery('GameAttempt');
+    const { data: redeemLogs, loading: redeemsLoading, refetch: refetchRedeems } = useQuery('RedeemLog');
+    const { mutate: insertRedeemLog } = useMutation('RedeemLog', 'insert');
+    
+    const totalCoins = useMemo(function() {
+      if (!gameAttempts || !redeemLogs) return 0;
+      const earned = gameAttempts.reduce(function(sum, attempt) {
+        return sum + (attempt.coinsEarned || 0);
+      }, 0);
+      const spent = redeemLogs.reduce(function(sum, redeem) {
+        return sum + (redeem.coinsSpent || 0);
+      }, 0);
+      return earned - spent;
+    }, [gameAttempts, redeemLogs]);
+    
+    const redeemCodeState = useState(null);
+    const redeemCode = redeemCodeState[0];
+    const setRedeemCode = redeemCodeState[1];
+    
+    const generateCode = function() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const part1 = Array(4).fill().map(function() { return chars[Math.floor(Math.random() * chars.length)]; }).join('');
+      const part2 = Array(4).fill().map(function() { return chars[Math.floor(Math.random() * chars.length)]; }).join('');
+      return part1 + '-' + part2;
+    };
+    
+    const handleRedeem = function() {
+      if (totalCoins < 5) {
+        Platform.OS === 'web' ? window.alert('Not enough coins! You need at least 5 coins.') : Alert.alert('Not Enough Coins', 'You need at least 5 coins to redeem.');
+        return;
+      }
+      
+      const newCode = generateCode();
+      const redeemData = {
+        coinsSpent: 5,
+        rewardCode: newCode,
+        timestamp: new Date().toISOString()
+      };
+      
+      insertRedeemLog(redeemData)
+        .then(function() {
+          refetchRedeems();
+          setRedeemCode(newCode);
+        })
+        .catch(function(error) {
+          Platform.OS === 'web' ? window.alert(error.message) : Alert.alert('Error', error.message);
+        });
+    };
+    
+    const recentRedeems = useMemo(function() {
+      if (!redeemLogs) return [];
+      return redeemLogs.slice().sort(function(a, b) {
+        return new Date(b.timestamp) - new Date(a.timestamp);
+      }).slice(0, 5);
+    }, [redeemLogs]);
+    
+    if (attemptsLoading || redeemsLoading) {
+      return React.createElement(View, { style: [styles.loadingContainer, { backgroundColor: theme.colors.background }], componentId: 'redeem-loading' },
+        React.createElement(ActivityIndicator, { size: 'large', color: theme.colors.primary, componentId: 'loading-indicator' })
+      );
+    }
+    
+    return React.createElement(ScrollView, {
+      style: { flex: 1, backgroundColor: theme.colors.background },
+      contentContainerStyle: { paddingTop: scrollTopPadding, paddingBottom: scrollBottomPadding },
+      componentId: 'redeem-scroll'
+    },
+      React.createElement(View, { style: styles.header, componentId: 'redeem-header' },
+        React.createElement(Text, { 
+          style: [styles.screenTitle, { color: theme.colors.textPrimary }], 
+          componentId: 'redeem-title' 
+        }, 'Redeem Codes'),
+        React.createElement(Text, { 
+          style: [styles.screenSubtitle, { color: theme.colors.textSecondary }], 
+          componentId: 'redeem-subtitle' 
+        }, 'Exchange your coins for reward codes')
+      ),
+      
+      React.createElement(View, { style: [styles.coinCard, { backgroundColor: theme.colors.card }], componentId: 'redeem-coin-card' },
+        React.createElement(MaterialIcons, { name: 'account-balance-wallet', size: 48, color: theme.colors.primary }),
+        React.createElement(Text, { 
+          style: [styles.coinBalance, { color: theme.colors.textPrimary }], 
+          componentId: 'redeem-coin-balance' 
+        }, totalCoins + ' Coins'),
+        React.createElement(Text, { 
+          style: [styles.coinSubtext, { color: theme.colors.textSecondary }], 
+          componentId: 'redeem-coin-subtext' 
+        }, '5 coins = 1 reward code')
+      ),
+      
+      React.createElement(View, { style: styles.redeemSection, componentId: 'redeem-section' },
+        React.createElement(TouchableOpacity, {
+          style: [
+            styles.redeemButton, 
+            { backgroundColor: totalCoins >= 5 ? theme.colors.primary : theme.colors.border }
+          ],
+          onPress: handleRedeem,
+          disabled: totalCoins < 5,
+          componentId: 'redeem-button'
+        },
+          React.createElement(MaterialIcons, { 
+            name: 'redeem', 
+            size: 32, 
+            color: totalCoins >= 5 ? '#FFFFFF' : theme.colors.textSecondary 
+          }),
+          React.createElement(Text, { 
+            style: [
+              styles.redeemButtonText, 
+              { color: totalCoins >= 5 ? '#FFFFFF' : theme.colors.textSecondary }
+            ], 
+            componentId: 'redeem-button-text' 
+          }, 'Redeem Code (5 coins)')
+        )
+      ),
+      
+      redeemCode ? React.createElement(View, { style: [styles.codeCard, { backgroundColor: theme.colors.success }], componentId: 'code-display-card' },
+        React.createElement(MaterialIcons, { name: 'card-giftcard', size: 32, color: '#FFFFFF' }),
+        React.createElement(Text, { style: styles.codeTitle, componentId: 'code-title' }, 'Your Reward Code:'),
+        React.createElement(Text, { style: styles.codeText, componentId: 'code-text' }, redeemCode),
+        React.createElement(TouchableOpacity, {
+          style: styles.copyButton,
+          onPress: function() {
+            Platform.OS === 'web' ? window.alert('Code copied: ' + redeemCode) : Alert.alert('Copied', 'Code copied: ' + redeemCode);
+          },
+          componentId: 'copy-code-button'
+        },
+          React.createElement(Text, { style: styles.copyButtonText, componentId: 'copy-button-text' }, 'Copy Code')
+        )
+      ) : null,
+      
+      recentRedeems.length > 0 ? React.createElement(View, { style: styles.historySection, componentId: 'redeem-history' },
+        React.createElement(Text, { 
+          style: [styles.sectionTitle, { color: theme.colors.textPrimary }], 
+          componentId: 'history-title' 
+        }, 'Recent Redeems'),
+        recentRedeems.map(function(redeem, index) {
+          return React.createElement(View, {
+            key: index,
+            style: [styles.historyItem, { backgroundColor: theme.colors.card }],
+            componentId: 'history-item-' + index
+          },
+            React.createElement(MaterialIcons, { name: 'history', size: 24, color: theme.colors.textSecondary }),
+            React.createElement(View, { style: styles.historyContent, componentId: 'history-content-' + index },
+              React.createElement(Text, { 
+                style: [styles.historyCode, { color: theme.colors.textPrimary }], 
+                componentId: 'history-code-' + index 
+              }, redeem.rewardCode),
+              React.createElement(Text, { 
+                style: [styles.historyDate, { color: theme.colors.textSecondary }], 
+                componentId: 'history-date-' + index 
+              }, new Date(redeem.timestamp).toLocaleDateString())
+            ),
+            React.createElement(Text, { 
+              style: [styles.historyCoins, { color: theme.colors.accent }], 
+              componentId: 'history-coins-' + index 
+            }, '-' + redeem.coinsSpent + ' coins')
+          );
+        })
+      ) : null
+    );
+  };
+  // @end:RedeemScreen
 
-<button onclick="win()">Math Game</button>
+  // @section:HistoryScreen @depends:[ThemeContext,styles]
+  const HistoryScreen = function() {
+    const themeContext = useTheme();
+    const theme = themeContext.theme;
+    const insets = useSafeAreaInsets();
+    const scrollBottomPadding = Platform.OS === 'web' ? WEB_TAB_BAR_PADDING : (TAB_BAR_HEIGHT + insets.bottom + SCROLL_EXTRA_PADDING);
+    const scrollTopPadding = insets.top;
+    
+    const { data: gameAttempts, loading, refetch } = useQuery('GameAttempt');
+    
+    const recentGames = useMemo(function() {
+      if (!gameAttempts) return [];
+      return gameAttempts.slice().sort(function(a, b) {
+        return new Date(b.timestamp) - new Date(a.timestamp);
+      });
+    }, [gameAttempts]);
+    
+    const totalEarned = useMemo(function() {
+      if (!gameAttempts) return 0;
+      return gameAttempts.reduce(function(sum, attempt) {
+        return sum + (attempt.coinsEarned || 0);
+      }, 0);
+    }, [gameAttempts]);
+    
+    const getGameIcon = function(gameType) {
+      switch(gameType) {
+        case 'puzzle': return 'extension';
+        case 'flag': return 'flag';
+        case 'color': return 'palette';
+        default: return 'games';
+      }
+    };
+    
+    const getGameName = function(gameType) {
+      switch(gameType) {
+        case 'puzzle': return 'Visual Puzzle';
+        case 'flag': return 'Flag Quiz';
+        case 'color': return 'Color Challenge';
+        default: return 'Unknown Game';
+      }
+    };
+    
+    if (loading) {
+      return React.createElement(View, { style: [styles.loadingContainer, { backgroundColor: theme.colors.background }], componentId: 'history-loading' },
+        React.createElement(ActivityIndicator, { size: 'large', color: theme.colors.primary, componentId: 'loading-indicator' })
+      );
+    }
+    
+    return React.createElement(ScrollView, {
+      style: { flex: 1, backgroundColor: theme.colors.background },
+      contentContainerStyle: { paddingTop: scrollTopPadding, paddingBottom: scrollBottomPadding },
+      componentId: 'history-scroll'
+    },
+      React.createElement(View, { style: styles.header, componentId: 'history-header' },
+        React.createElement(Text, { 
+          style: [styles.screenTitle, { color: theme.colors.textPrimary }], 
+          componentId: 'history-title' 
+        }, 'Game History'),
+        React.createElement(Text, { 
+          style: [styles.screenSubtitle, { color: theme.colors.textSecondary }], 
+          componentId: 'history-subtitle' 
+        }, 'Your gaming achievements')
+      ),
+      
+      React.createElement(View, { style: [styles.statsCard, { backgroundColor: theme.colors.card }], componentId: 'stats-card' },
+        React.createElement(View, { style: styles.statItem, componentId: 'total-games-stat' },
+          React.createElement(MaterialIcons, { name: 'sports-esports', size: 32, color: theme.colors.primary }),
+          React.createElement(View, { style: styles.statContent, componentId: 'total-games-content' },
+            React.createElement(Text, { 
+              style: [styles.statValue, { color: theme.colors.textPrimary }], 
+              componentId: 'total-games-value' 
+            }, recentGames.length),
+            React.createElement(Text, { 
+              style: [styles.statLabel, { color: theme.colors.textSecondary }], 
+              componentId: 'total-games-label' 
+            }, 'Games Played')
+          )
+        ),
+        React.createElement(View, { style: styles.statItem, componentId: 'total-coins-stat' },
+          React.createElement(MaterialIcons, { name: 'monetization-on', size: 32, color: theme.colors.success }),
+          React.createElement(View, { style: styles.statContent, componentId: 'total-coins-content' },
+            React.createElement(Text, { 
+              style: [styles.statValue, { color: theme.colors.textPrimary }], 
+              componentId: 'total-coins-value' 
+            }, totalEarned),
+            React.createElement(Text, { 
+              style: [styles.statLabel, { color: theme.colors.textSecondary }], 
+              componentId: 'total-coins-label' 
+            }, 'Coins Earned')
+          )
+        )
+      ),
+      
+      recentGames.length > 0 ? React.createElement(View, { style: styles.gamesListSection, componentId: 'games-list' },
+        React.createElement(Text, { 
+          style: [styles.sectionTitle, { color: theme.colors.textPrimary }], 
+          componentId: 'games-list-title' 
+        }, 'Recent Games'),
+        recentGames.map(function(game, index) {
+          return React.createElement(View, {
+            key: index,
+            style: [styles.gameHistoryItem, { backgroundColor: theme.colors.card }],
+            componentId: 'game-history-item-' + index
+          },
+            React.createElement(MaterialIcons, { 
+              name: getGameIcon(game.gameType), 
+              size: 32, 
+              color: theme.colors.primary 
+            }),
+            React.createElement(View, { style: styles.gameHistoryContent, componentId: 'game-history-content-' + index },
+              React.createElement(Text, { 
+                style: [styles.gameHistoryName, { color: theme.colors.textPrimary }], 
+                componentId: 'game-history-name-' + index 
+              }, getGameName(game.gameType)),
+              React.createElement(Text, { 
+                style: [styles.gameHistoryDate, { color: theme.colors.textSecondary }], 
+                componentId: 'game-history-date-' + index 
+              }, new Date(game.timestamp).toLocaleDateString() + ' ' + new Date(game.timestamp).toLocaleTimeString())
+            ),
+            React.createElement(View, { style: styles.coinsEarned, componentId: 'coins-earned-' + index },
+              React.createElement(MaterialIcons, { name: 'add', size: 16, color: theme.colors.success }),
+              React.createElement(Text, { 
+                style: [styles.coinsEarnedText, { color: theme.colors.success }], 
+                componentId: 'coins-earned-text-' + index 
+              }, game.coinsEarned + ' coins')
+            )
+          );
+        })
+      ) : React.createElement(View, { style: styles.emptyState, componentId: 'empty-state' },
+        React.createElement(MaterialIcons, { name: 'history', size: 64, color: theme.colors.border }),
+        React.createElement(Text, { 
+          style: [styles.emptyStateText, { color: theme.colors.textSecondary }], 
+          componentId: 'empty-state-text' 
+        }, 'No games played yet'),
+        React.createElement(Text, { 
+          style: [styles.emptyStateSubtext, { color: theme.colors.textSecondary }], 
+          componentId: 'empty-state-subtext' 
+        }, 'Start playing games to see your history here!')
+      )
+    );
+  };
+  // @end:HistoryScreen
 
-<button onclick="win()">Capital Game</button>
+  // @section:styles @depends:[theme]
+  const styles = StyleSheet.create({
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    header: {
+      padding: 20,
+      alignItems: 'center'
+    },
+    appTitle: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      marginBottom: 8
+    },
+    appSubtitle: {
+      fontSize: 16,
+      textAlign: 'center'
+    },
+    screenTitle: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginBottom: 8
+    },
+    screenSubtitle: {
+      fontSize: 16,
+      textAlign: 'center'
+    },
+    coinCard: {
+      margin: 16,
+      padding: 24,
+      borderRadius: 20,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8
+    },
+    coinBalance: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginTop: 12,
+      marginBottom: 4
+    },
+    coinSubtext: {
+      fontSize: 14
+    },
+    gamesSection: {
+      padding: 16
+    },
+    sectionTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      marginBottom: 16
+    },
+    gameCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 20,
+      marginBottom: 12,
+      borderRadius: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4
+    },
+    gameCardContent: {
+      flex: 1,
+      marginLeft: 16
+    },
+    gameCardTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 4
+    },
+    gameCardDescription: {
+      fontSize: 14
+    },
+    gameHeader: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginBottom: 16
+    },
+    closeButton: {
+      padding: 8,
+      borderRadius: 20
+    },
+    gameContent: {
+      flex: 1
+    },
+    gameTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 24
+    },
+    puzzleContainer: {
+      alignItems: 'center',
+      marginBottom: 32
+    },
+    puzzleStep: {
+      fontSize: 16,
+      marginBottom: 8
+    },
+    puzzleInstruction: {
+      fontSize: 18,
+      fontWeight: '600',
+      textAlign: 'center',
+      marginBottom: 24
+    },
+    puzzleVisual: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '100%',
+      marginBottom: 24
+    },
+    puzzleDot: {
+      width: 60,
+      height: 60,
+      borderRadius: 30
+    },
+    gameButton: {
+      padding: 16,
+      borderRadius: 24,
+      alignItems: 'center',
+      marginTop: 16
+    },
+    gameButtonText: {
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontWeight: 'bold'
+    },
+    flagContainer: {
+      alignItems: 'center'
+    },
+    flagQuestion: {
+      fontSize: 18,
+      fontWeight: '600',
+      textAlign: 'center',
+      marginBottom: 24
+    },
+    flagImage: {
+      padding: 20,
+      marginBottom: 24
+    },
+    flagEmoji: {
+      fontSize: 80
+    },
+    flagOptions: {
+      width: '100%',
+      marginBottom: 24
+    },
+    flagOption: {
+      padding: 16,
+      borderRadius: 12,
+      marginBottom: 12,
+      borderWidth: 2
+    },
+    flagOptionText: {
+      fontSize: 16,
+      fontWeight: '600',
+      textAlign: 'center'
+    },
+    colorContainer: {
+      alignItems: 'center'
+    },
+    colorQuestion: {
+      fontSize: 18,
+      fontWeight: '600',
+      textAlign: 'center',
+      marginBottom: 32
+    },
+    colorOptions: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-around',
+      width: '100%',
+      marginBottom: 32
+    },
+    colorOption: {
+      width: 80,
+      height: 80,
+      borderRadius: 20,
+      margin: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 2
+    },
+    colorOptionText: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      textAlign: 'center'
+    },
+    redeemSection: {
+      padding: 16
+    },
+    redeemButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      borderRadius: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8
+    },
+    redeemButtonText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginLeft: 12
+    },
+    codeCard: {
+      margin: 16,
+      padding: 24,
+      borderRadius: 20,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8
+    },
+    codeTitle: {
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginTop: 12,
+      marginBottom: 8
+    },
+    codeText: {
+      color: '#FFFFFF',
+      fontSize: 24,
+      fontWeight: 'bold',
+      letterSpacing: 2,
+      marginBottom: 16
+    },
+    copyButton: {
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      padding: 12,
+      borderRadius: 12
+    },
+    copyButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600'
+    },
+    historySection: {
+      padding: 16
+    },
+    historyItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      marginBottom: 12,
+      borderRadius: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2
+    },
+    historyContent: {
+      flex: 1,
+      marginLeft: 12
+    },
+    historyCode: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 4
+    },
+    historyDate: {
+      fontSize: 14
+    },
+    historyCoins: {
+      fontSize: 14,
+      fontWeight: '600'
+    },
+    statsCard: {
+      margin: 16,
+      padding: 20,
+      borderRadius: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8
+    },
+    statItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16
+    },
+    statContent: {
+      marginLeft: 16
+    },
+    statValue: {
+      fontSize: 24,
+      fontWeight: 'bold'
+    },
+    statLabel: {
+      fontSize: 14
+    },
+    gamesListSection: {
+      padding: 16
+    },
+    gameHistoryItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      marginBottom: 12,
+      borderRadius: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2
+    },
+    gameHistoryContent: {
+      flex: 1,
+      marginLeft: 16
+    },
+    gameHistoryName: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 4
+    },
+    gameHistoryDate: {
+      fontSize: 12
+    },
+    coinsEarned: {
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
+    coinsEarnedText: {
+      fontSize: 14,
+      fontWeight: '600',
+      marginLeft: 4
+    },
+    emptyState: {
+      alignItems: 'center',
+      padding: 40
+    },
+    emptyStateText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginTop: 16,
+      marginBottom: 8
+    },
+    emptyStateSubtext: {
+      fontSize: 14,
+      textAlign: 'center'
+    }
+  });
+  // @end:styles
 
-<button onclick="win()">Quiz Game</button>
+  // @section:TabNavigator @depends:[HomeScreen,RedeemScreen,HistoryScreen,navigation-setup]
+  const TabNavigator = function() {
+    const insets = useSafeAreaInsets();
+    const themeContext = useTheme();
+    const theme = themeContext.theme;
+    
+    return React.createElement(Tab.Navigator, {
+      screenOptions: {
+        headerShown: false,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.textSecondary,
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 0,
+          height: TAB_BAR_HEIGHT + insets.bottom,
+          backgroundColor: theme.colors.card,
+          borderTopWidth: 0,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 8
+        },
+        tabBarItemStyle: { padding: 0 }
+      }
+    },
+      React.createElement(Tab.Screen, {
+        name: 'Home',
+        component: HomeScreen,
+        options: {
+          tabBarIcon: function(props) {
+            return React.createElement(MaterialIcons, {
+              name: 'home',
+              size: 24,
+              color: props.color
+            });
+          }
+        }
+      }),
+      React.createElement(Tab.Screen, {
+        name: 'Redeem',
+        component: RedeemScreen,
+        options: {
+          tabBarIcon: function(props) {
+            return React.createElement(MaterialIcons, {
+              name: 'redeem',
+              size: 24,
+              color: props.color
+            });
+          }
+        }
+      }),
+      React.createElement(Tab.Screen, {
+        name: 'History',
+        component: HistoryScreen,
+        options: {
+          tabBarIcon: function(props) {
+            return React.createElement(MaterialIcons, {
+              name: 'history',
+              size: 24,
+              color: props.color
+            });
+          }
+        }
+      })
+    );
+  };
+  // @end:TabNavigator
 
-<br>
-
-<button class="redeem" onclick="redeem()">Redeem ₹10</button>
-
-<script>
-
-var coin=0;
-
-function win(){
-coin+=10;
-document.getElementById("coin").innerHTML=coin;
-alert("You win 10 coins!");
-}
-
-function redeem(){
-if(coin>=2000){
-coin-=2000;
-document.getElementById("coin").innerHTML=coin;
-alert("Code: CGT69J94NUCW7CZE");
-}else{
-alert("Not enough coins");
-}
-}
-
-</script>
-
-</body>
-</html>
+  // @section:return @depends:[ThemeProvider,TabNavigator]
+  return React.createElement(ThemeProvider, null,
+    React.createElement(View, { style: { flex: 1, width: '100%', height: '100%', overflow: 'hidden' } },
+      React.createElement(StatusBar, { barStyle: 'dark-content' }),
+      React.createElement(TabNavigator)
+    )
+  );
+  // @end:return
+};
+return ComponentFunctio
