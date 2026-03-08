@@ -1,69 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Mini FPS</title>
+<title>CoinVault</title>
 <style>
-body { margin:0; overflow:hidden; background:black; }
-#shootBtn {
-position:fixed;
-right:20px;
-bottom:40px;
-width:80px;
-height:80px;
-border-radius:50%;
-background:red;
-color:white;
-font-size:20px;
-border:none;
+body{
+font-family:Arial;
+background:#f5f5f5;
+text-align:center;
 }
+
+.header{
+background:#FFD700;
+padding:15px;
+font-size:24px;
+font-weight:bold;
+}
+
+.coin{
+font-size:22px;
+margin:20px;
+}
+
+button{
+width:200px;
+padding:15px;
+margin:10px;
+font-size:18px;
+border:none;
+border-radius:10px;
+background:#FFD700;
+}
+
+.redeem{
+background:#4CAF50;
+color:white;
+}
+
 </style>
 </head>
+
 <body>
 
-<button id="shootBtn">FIRE</button>
+<div class="header">CoinVault</div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<div class="coin">
+Coins: <span id="coin">0</span>
+</div>
+
+<button onclick="win()">Math Game</button>
+
+<button onclick="win()">Capital Game</button>
+
+<button onclick="win()">Quiz Game</button>
+
+<br>
+
+<button class="redeem" onclick="redeem()">Redeem ₹10</button>
 
 <script>
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-let renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
 
-// Yer
-let planeGeo = new THREE.PlaneGeometry(100,100);
-let planeMat = new THREE.MeshBasicMaterial({color:0x8B4513});
-let plane = new THREE.Mesh(planeGeo, planeMat);
-plane.rotation.x = -Math.PI/2;
-scene.add(plane);
+var coin=0;
 
-// Dushman kub
-let enemyGeo = new THREE.BoxGeometry(2,2,2);
-let enemyMat = new THREE.MeshBasicMaterial({color:0x0000ff});
-let enemy = new THREE.Mesh(enemyGeo, enemyMat);
-enemy.position.set(0,1,-10);
-scene.add(enemy);
-
-camera.position.y = 2;
-
-function animate(){
-requestAnimationFrame(animate);
-renderer.render(scene,camera);
+function win(){
+coin+=10;
+document.getElementById("coin").innerHTML=coin;
+alert("You win 10 coins!");
 }
-animate();
 
-// Otish
-document.getElementById("shootBtn").onclick = function(){
-let raycaster = new THREE.Raycaster();
-raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
-let hits = raycaster.intersectObjects([enemy]);
-if(hits.length > 0){
-enemy.material.color.set(0xff0000);
-alert("Enemy Hit!");
+function redeem(){
+if(coin>=2000){
+coin-=2000;
+document.getElementById("coin").innerHTML=coin;
+alert("Code: CGT69J94NUCW7CZE");
+}else{
+alert("Not enough coins");
 }
 }
+
 </script>
 
 </body>
