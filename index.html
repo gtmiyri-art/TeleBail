@@ -1,201 +1,133 @@
-// CoinValetua - Full App Code
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>CoinValuta</title>
+<style>
+body { font-family:sans-serif; margin:0; padding:0; background:#fff8dc; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; }
+.hidden { display:none; }
+#coin { width:150px; height:150px; border-radius:50%; background:gold; display:flex; justify-content:center; align-items:center; font-size:48px; font-weight:bold; color:white; animation:spin 10s linear forwards; margin-bottom:20px; }
+@keyframes spin { from { transform:rotate(0deg);} to { transform:rotate(3600deg);} }
+button { padding:10px 20px; margin:5px; font-size:16px; cursor:pointer; border-radius:5px; border:none; background:#ff8c00; color:white; }
+input { padding:10px; font-size:16px; margin:10px; width:80%; border-radius:5px; }
+h1,h2 { text-align:center; }
+ul { list-style:none; padding:0; }
+li { margin:5px 0; }
+</style>
+</head>
+<body>
 
-import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, Alert, Platform, StatusBar, ActivityIndicator } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+<!-- Scratch Loading -->
+<div id="loading">
+  <div id="coin">M</div>
+  <h2>Loading...</h2>
+</div>
 
-// ===== ThemeContext =====
-const primaryColor = '#F59E0B';
-const accentColor = '#EF4444';
-const backgroundColor = '#FEF3C7';
-const cardColor = '#FFFFFF';
-const textPrimary = '#1F2937';
-const textSecondary = '#6B7280';
-const designStyle = 'playful';
+<!-- Sign In -->
+<div id="signin" class="hidden">
+  <h1>CoinValuta</h1>
+  <button onclick="login()">Sign In with Google</button>
+</div>
 
-const ThemeContext = React.createContext();
-const ThemeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(false);
+<!-- Home -->
+<div id="home" class="hidden">
+  <h1>CoinValuta</h1>
+  <p>Coins: <span id="coins">0</span></p>
+  <p>Level: <span id="level">1</span></p>
+  <button onclick="playGame('color')">Rang O‘yini</button>
+  <button onclick="playGame('math')">Matematika O‘yini</button>
+  <button onclick="playGame('flag')">Mamlakat Bayrog‘i</button>
+  <button onclick="redeem()">Redeem Code</button>
+  <button onclick="promo()">Promo Code</button>
+  <button onclick="share()">Share App Link</button>
+  <button onclick="privacy()">Privacy Policy</button>
+  <button onclick="logout()">Logout</button>
+</div>
 
-  const lightTheme = useMemo(() => ({
-    colors: { primary: primaryColor, accent: accentColor, background: backgroundColor, card: cardColor, textPrimary, textSecondary, border: '#E5E7EB', success: '#10B981', error: '#EF4444', warning: '#F59E0B' }
-  }), []);
+<!-- Redeem Code -->
+<div id="redeem" class="hidden">
+  <h1>Redeem Code</h1>
+  <ul>
+    <li>₹10 - 2000 coin</li>
+    <li>10 IDR - 3000 coin</li>
+    <li>€1 - 3500 coin</li>
+    <li>£1 - 5000 coin</li>
+    <li>50 TRY - 4000 coin</li>
+    <li>$4 - 11000 coin</li>
+    <li>$5 - 15000 coin</li>
+  </ul>
+  <button onclick="backHome()">Orqaga</button>
+</div>
 
-  const darkTheme = useMemo(() => ({
-    colors: { primary: primaryColor, accent: accentColor, background: '#1F2937', card: '#374151', textPrimary: '#F9FAFB', textSecondary: '#D1D5DB', border: '#4B5563', success: '#10B981', error: '#EF4444', warning: '#F59E0B' }
-  }), []);
+<!-- Promo Code -->
+<div id="promo" class="hidden">
+  <h1>Promo Code</h1>
+  <input type="text" placeholder="Promo code yozing">
+  <button onclick="joinNow()">Join Now</button>
+  <button onclick="backHome()">Orqaga</button>
+</div>
 
-  const theme = darkMode ? darkTheme : lightTheme;
-  const toggleDarkMode = useCallback(() => setDarkMode(prev => !prev), []);
+<script>
+// initial
+let coins = 0;
+let level = 1;
 
-  const value = useMemo(() => ({ theme, darkMode, toggleDarkMode, designStyle }), [theme, darkMode]);
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-};
+// Scratch Loading -> Sign In
+setTimeout(() => {
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('signin').classList.remove('hidden');
+}, 10000);
 
-const useTheme = () => useContext(ThemeContext);
-
-// ===== Coin & Game Logic =====
-const initialGames = {
-  puzzle: { currentStep: 0, solved: false },
-  flag: { selectedAnswer: null, correctAnswer: 2 },
-  color: { selectedColor: null, correctColor: '#FF0000' }
-};
-
-const puzzleSteps = ['Connect the dots', 'Match the pattern', 'Complete the sequence'];
-const flagOptions = ['Brazil', 'Germany', 'Japan', 'Canada'];
-const colorOptions = [{name:'Red', value:'#FF0000'},{name:'Blue', value:'#0000FF'},{name:'Green', value:'#00FF00'},{name:'Yellow', value:'#FFFF00'}];
-
-// ===== GameModal =====
-const GameModal = ({ visible, gameType, onClose, onSuccess, theme }) => {
-  const [gameState, setGameState] = useState(initialGames);
-
-  const handleGameAction = (action, value) => {
-    if(gameType==='puzzle'){
-      if(action==='next'){
-        const current = gameState.puzzle;
-        if(current.currentStep < puzzleSteps.length-1){
-          setGameState(prev=>({...prev, puzzle:{...prev.puzzle, currentStep: prev.puzzle.currentStep+1}}));
-        }else{
-          setGameState(prev=>({...prev, puzzle:{...prev.puzzle, solved:true}}));
-          onSuccess();
-        }
-      }
-    } else if(gameType==='flag'){
-      if(action==='select'){ setGameState(prev=>({...prev, flag:{...prev.flag, selectedAnswer:value}})); }
-      else if(action==='submit'){
-        if(gameState.flag.selectedAnswer === gameState.flag.correctAnswer){ onSuccess(); }
-        else{ Alert.alert('Wrong Answer','Try again.'); }
-      }
-    } else if(gameType==='color'){
-      if(action==='select'){ setGameState(prev=>({...prev, color:{...prev.color, selectedColor:value}})); }
-      else if(action==='submit'){
-        if(gameState.color.selectedColor===gameState.color.correctColor){ onSuccess(); }
-        else{ Alert.alert('Wrong Color','Try again.'); }
-      }
-    }
-  };
-
-  const renderPuzzle = () => {
-    const current = gameState.puzzle;
-    return (
-      <View style={styles.gameContent}>
-        <Text style={[styles.gameTitle,{color:theme.colors.textPrimary}]}>Visual Puzzle</Text>
-        <Text style={[styles.puzzleInstruction,{color:theme.colors.textSecondary}]}>Step {current.currentStep+1} of {puzzleSteps.length}: {puzzleSteps[current.currentStep]}</Text>
-        <TouchableOpacity style={[styles.gameButton,{backgroundColor:theme.colors.primary}]} onPress={()=>handleGameAction('next')}>
-          <Text style={styles.gameButtonText}>{current.currentStep===puzzleSteps.length-1?'Complete':'Next Step'}</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const renderFlag = () => {
-    const current = gameState.flag;
-    return (
-      <View style={styles.gameContent}>
-        <Text style={[styles.gameTitle,{color:theme.colors.textPrimary}]}>Flag Quiz</Text>
-        {flagOptions.map((o,i)=>
-          <TouchableOpacity key={i} onPress={()=>handleGameAction('select',i)} style={{padding:12,margin:4,backgroundColor:current.selectedAnswer===i?theme.colors.primary:theme.colors.card}}>
-            <Text style={{color:current.selectedAnswer===i?'#fff':theme.colors.textPrimary}}>{o}</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity onPress={()=>handleGameAction('submit')} style={[styles.gameButton,{backgroundColor:current.selectedAnswer!==null?theme.colors.primary:theme.colors.border}]} disabled={current.selectedAnswer===null}>
-          <Text style={styles.gameButtonText}>Submit Answer</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const renderColor = () => {
-    const current = gameState.color;
-    return (
-      <View style={styles.gameContent}>
-        <Text style={[styles.gameTitle,{color:theme.colors.textPrimary}]}>Color Challenge</Text>
-        {colorOptions.map((o,i)=>
-          <TouchableOpacity key={i} onPress={()=>handleGameAction('select',o.value)} style={{width:60,height:60,margin:4,backgroundColor:o.value,borderWidth:current.selectedColor===o.value?4:2,borderColor:theme.colors.textPrimary}}/>
-        )}
-        <TouchableOpacity onPress={()=>handleGameAction('submit')} style={[styles.gameButton,{backgroundColor:current.selectedColor!==null?theme.colors.primary:theme.colors.border}]} disabled={current.selectedColor===null}>
-          <Text style={styles.gameButtonText}>Submit Answer</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{flex:1,justifyContent:'center',backgroundColor:'rgba(0,0,0,0.5)'}}>
-        <View style={{margin:20,padding:20,backgroundColor:theme.colors.background,borderRadius:20}}>
-          <TouchableOpacity style={{alignSelf:'flex-end'}} onPress={onClose}><MaterialIcons name="close" size={24} color={theme.colors.textPrimary}/></TouchableOpacity>
-          <ScrollView>{gameType==='puzzle'?renderPuzzle():gameType==='flag'?renderFlag():gameType==='color'?renderColor():null}</ScrollView>
-        </View>
-      </View>
-    </Modal>
-  );
-};
-
-// ===== HomeScreen =====
-const HomeScreen = () => {
-  const { theme } = useTheme();
-  const [coins, setCoins] = useState(0);
-  const [showGame, setShowGame] = useState(null);
-
-  const handleGameSuccess = (type) => { setCoins(prev=>prev+10); setShowGame(null); Alert.alert('Success','+10 Coins!'); };
-
-  return (
-    <ScrollView style={{flex:1,backgroundColor:theme.colors.background}}>
-      <View style={styles.header}>
-        <Text style={[styles.appTitle,{color:theme.colors.textPrimary}]}>CoinValetua</Text>
-        <Text style={[styles.appSubtitle,{color:theme.colors.textSecondary}]}>Earn coins by playing games!</Text>
-      </View>
-
-      <View style={[styles.coinCard,{backgroundColor:theme.colors.card}]}>
-        <MaterialIcons name="monetization-on" size={48} color={theme.colors.primary}/>
-        <Text style={[styles.coinBalance,{color:theme.colors.textPrimary}]}>{coins} Coins</Text>
-        <Text style={[styles.coinSubtext,{color:theme.colors.textSecondary}]}>Play games to earn more!</Text>
-      </View>
-
-      <TouchableOpacity style={[styles.gameCard,{backgroundColor:theme.colors.card}]} onPress={()=>setShowGame('puzzle')}>
-        <MaterialIcons name="extension" size={32} color={theme.colors.primary}/>
-        <Text style={{marginLeft:16,color:theme.colors.textPrimary}}>Visual Puzzle</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.gameCard,{backgroundColor:theme.colors.card}]} onPress={()=>setShowGame('flag')}>
-        <MaterialIcons name="flag" size={32} color={theme.colors.accent}/>
-        <Text style={{marginLeft:16,color:theme.colors.textPrimary}}>Flag Quiz</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.gameCard,{backgroundColor:theme.colors.card}]} onPress={()=>setShowGame('color')}>
-        <MaterialIcons name="palette" size={32} color={theme.colors.success}/>
-        <Text style={{marginLeft:16,color:theme.colors.textPrimary}}>Color Challenge</Text>
-      </TouchableOpacity>
-
-      {showGame && <GameModal visible={true} gameType={showGame} onClose={()=>setShowGame(null)} onSuccess={()=>handleGameSuccess(showGame)} theme={theme}/>}
-    </ScrollView>
-  );
-};
-
-// ===== Styles =====
-const styles = StyleSheet.create({
-  header:{padding:20,alignItems:'center'},
-  appTitle:{fontSize:32,fontWeight:'bold'},
-  appSubtitle:{fontSize:16,textAlign:'center'},
-  coinCard:{margin:16,padding:24,borderRadius:20,alignItems:'center',shadowColor:'#000',shadowOffset:{width:0,height:4},shadowOpacity:0.15,shadowRadius:12,elevation:8},
-  coinBalance:{fontSize:28,fontWeight:'bold',marginTop:12,marginBottom:4},
-  coinSubtext:{fontSize:14},
-  gameCard:{flexDirection:'row',alignItems:'center',padding:16,margin:12,borderRadius:20,shadowColor:'#000',shadowOffset:{width:0,height:2},shadowOpacity:0.1,shadowRadius:8,elevation:4},
-  gameContent:{flex:1},
-  gameTitle:{fontSize:24,fontWeight:'bold',textAlign:'center',marginBottom:24},
-  puzzleInstruction:{fontSize:16,marginBottom:12},
-  gameButton:{padding:16,borderRadius:24,alignItems:'center',marginTop:16},
-  gameButtonText:{color:'#FFFFFF',fontSize:18,fontWeight:'bold'}
-});
-
-// ===== App Export =====
-export default function App() {
-  return (
-    <ThemeProvider>
-      <HomeScreen/>
-    </ThemeProvider>
-  );
+// Sign In
+function login(){
+  alert('Google Sign In ishlaydi (mock)');
+  document.getElementById('signin').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
 }
+
+// Games
+function playGame(type){
+  coins += 10;
+  document.getElementById('coins').innerText = coins;
+  alert(type + ' o‘yini o‘ynaldi, 10 coin olindi!');
+  if(coins >= level*50){ level++; document.getElementById('level').innerText = level; }
+}
+
+// Redeem Code
+function redeem(){
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('redeem').classList.remove('hidden');
+}
+
+// Promo Code
+function promo(){
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('promo').classList.remove('hidden');
+}
+function joinNow(){
+  alert('Telegram kanalga o‘tadi (mock)');
+}
+
+// Share App
+function share(){ alert('Share App Link ishlaydi (mock)'); }
+
+// Privacy Policy
+function privacy(){ alert('Privacy Policy sahifasi ishlaydi (mock)'); }
+
+// Logout
+function logout(){
+  if(confirm('Chiqmoqchimisiz?')){
+    document.getElementById('home').classList.add('hidden');
+    document.getElementById('signin').classList.remove('hidden');
+  }
+}
+
+// Back to Home
+function backHome(){
+  document.getElementById('redeem').classList.add('hidden');
+  document.getElementById('promo').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
