@@ -2,132 +2,168 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<title>CoinValuta</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoinValeuta</title>
 <style>
-body { font-family:sans-serif; margin:0; padding:0; background:#fff8dc; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; }
-.hidden { display:none; }
-#coin { width:150px; height:150px; border-radius:50%; background:gold; display:flex; justify-content:center; align-items:center; font-size:48px; font-weight:bold; color:white; animation:spin 10s linear forwards; margin-bottom:20px; }
-@keyframes spin { from { transform:rotate(0deg);} to { transform:rotate(3600deg);} }
-button { padding:10px 20px; margin:5px; font-size:16px; cursor:pointer; border-radius:5px; border:none; background:#ff8c00; color:white; }
-input { padding:10px; font-size:16px; margin:10px; width:80%; border-radius:5px; }
-h1,h2 { text-align:center; }
-ul { list-style:none; padding:0; }
-li { margin:5px 0; }
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#111;
+  color:white;
+}
+
+/* ☰ uch chiziq */
+.menu-btn{
+  font-size:28px;
+  padding:12px 16px;
+  cursor:pointer;
+}
+
+/* Yon menu */
+.side-menu{
+  height:100%;
+  width:0;
+  position:fixed;
+  top:0;
+  left:0;
+  background:#222;
+  overflow-x:hidden;
+  transition:0.3s;
+  padding-top:60px;
+  z-index:1000;
+}
+.side-menu a{
+  padding:12px 24px;
+  text-decoration:none;
+  color:white;
+  display:block;
+  border-bottom:1px solid #333;
+}
+.side-menu a:hover{
+  background:#333;
+}
+.close-btn{
+  position:absolute;
+  top:10px;
+  right:20px;
+  font-size:28px;
+  cursor:pointer;
+}
+
+/* Profil va coin */
+.profile{
+  padding:15px 20px;
+  display:flex;
+  align-items:center;
+}
+.profile img{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  border:2px solid gold;
+  margin-right:12px;
+}
+.coin{
+  background:#222;
+  padding:4px 8px;
+  border-radius:12px;
+  margin-left:auto;
+  font-weight:bold;
+}
+
+/* Katta karta tugmalar */
+.card-container{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:15px;
+  padding:20px;
+}
+.card{
+  background:#1a1a1a;
+  border-radius:12px;
+  padding:15px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.2s;
+}
+.card:hover{
+  background:#333;
+}
+.card img{
+  width:60px;
+  height:60px;
+  margin-bottom:10px;
+}
+
+/* Kartalar nomi */
+.card span{
+  font-size:14px;
+  font-weight:bold;
+}
+
 </style>
 </head>
 <body>
 
-<!-- Scratch Loading -->
-<div id="loading">
-  <div id="coin">M</div>
-  <h2>Loading...</h2>
+<!-- ☰ Menu -->
+<span class="menu-btn" onclick="openMenu()">☰</span>
+
+<div id="menu" class="side-menu">
+  <span class="close-btn" onclick="closeMenu()">×</span>
+  
+  <div class="profile">
+    <img src="profile.png" alt="Profil">
+    <div>
+      <div>M</div>
+      <small>gtmiyri@gmail.com</small>
+    </div>
+    <div class="coin">318 🪙</div>
+  </div>
+  
+  <a href="#">Home</a>
+  <a href="#">Redeem Now</a>
+  <a href="#">History</a>
+  <a href="#">Share</a>
+  <a href="#">Privacy Policy</a>
+  <a href="#">Logout</a>
 </div>
 
-<!-- Sign In -->
-<div id="signin" class="hidden">
-  <h1>CoinValuta</h1>
-  <button onclick="login()">Sign In with Google</button>
-</div>
-
-<!-- Home -->
-<div id="home" class="hidden">
-  <h1>CoinValuta</h1>
-  <p>Coins: <span id="coins">0</span></p>
-  <p>Level: <span id="level">1</span></p>
-  <button onclick="playGame('color')">Rang O‘yini</button>
-  <button onclick="playGame('math')">Matematika O‘yini</button>
-  <button onclick="playGame('flag')">Mamlakat Bayrog‘i</button>
-  <button onclick="redeem()">Redeem Code</button>
-  <button onclick="promo()">Promo Code</button>
-  <button onclick="share()">Share App Link</button>
-  <button onclick="privacy()">Privacy Policy</button>
-  <button onclick="logout()">Logout</button>
-</div>
-
-<!-- Redeem Code -->
-<div id="redeem" class="hidden">
-  <h1>Redeem Code</h1>
-  <ul>
-    <li>₹10 - 2000 coin</li>
-    <li>10 IDR - 3000 coin</li>
-    <li>€1 - 3500 coin</li>
-    <li>£1 - 5000 coin</li>
-    <li>50 TRY - 4000 coin</li>
-    <li>$4 - 11000 coin</li>
-    <li>$5 - 15000 coin</li>
-  </ul>
-  <button onclick="backHome()">Orqaga</button>
-</div>
-
-<!-- Promo Code -->
-<div id="promo" class="hidden">
-  <h1>Promo Code</h1>
-  <input type="text" placeholder="Promo code yozing">
-  <button onclick="joinNow()">Join Now</button>
-  <button onclick="backHome()">Orqaga</button>
+<!-- Karta tugmalar -->
+<div class="card-container">
+  <div class="card">
+    <img src="checkin.png" alt="Checkin">
+    <span>Checkin</span>
+  </div>
+  <div class="card">
+    <img src="math.png" alt="Math Quiz">
+    <span>Math Quizzes</span>
+  </div>
+  <div class="card">
+    <img src="emoji.png" alt="Emoji Quiz">
+    <span>Emoji Quizzes</span>
+  </div>
+  <div class="card">
+    <img src="learn.png" alt="Learn Quiz">
+    <span>Learn Quiz</span>
+  </div>
+  <div class="card">
+    <img src="invite.png" alt="Invite & Earn">
+    <span>Invite & Earn</span>
+  </div>
+  <div class="card">
+    <img src="special.png" alt="Special Offers">
+    <span>Special Offers</span>
+  </div>
 </div>
 
 <script>
-// initial
-let coins = 0;
-let level = 1;
-
-// Scratch Loading -> Sign In
-setTimeout(() => {
-  document.getElementById('loading').classList.add('hidden');
-  document.getElementById('signin').classList.remove('hidden');
-}, 10000);
-
-// Sign In
-function login(){
-  alert('Google Sign In ishlaydi (mock)');
-  document.getElementById('signin').classList.add('hidden');
-  document.getElementById('home').classList.remove('hidden');
+function openMenu(){
+  document.getElementById("menu").style.width="250px";
 }
-
-// Games
-function playGame(type){
-  coins += 10;
-  document.getElementById('coins').innerText = coins;
-  alert(type + ' o‘yini o‘ynaldi, 10 coin olindi!');
-  if(coins >= level*50){ level++; document.getElementById('level').innerText = level; }
-}
-
-// Redeem Code
-function redeem(){
-  document.getElementById('home').classList.add('hidden');
-  document.getElementById('redeem').classList.remove('hidden');
-}
-
-// Promo Code
-function promo(){
-  document.getElementById('home').classList.add('hidden');
-  document.getElementById('promo').classList.remove('hidden');
-}
-function joinNow(){
-  alert('Telegram kanalga o‘tadi (mock)');
-}
-
-// Share App
-function share(){ alert('Share App Link ishlaydi (mock)'); }
-
-// Privacy Policy
-function privacy(){ alert('Privacy Policy sahifasi ishlaydi (mock)'); }
-
-// Logout
-function logout(){
-  if(confirm('Chiqmoqchimisiz?')){
-    document.getElementById('home').classList.add('hidden');
-    document.getElementById('signin').classList.remove('hidden');
-  }
-}
-
-// Back to Home
-function backHome(){
-  document.getElementById('redeem').classList.add('hidden');
-  document.getElementById('promo').classList.add('hidden');
-  document.getElementById('home').classList.remove('hidden');
+function closeMenu(){
+  document.getElementById("menu").style.width="0";
 }
 </script>
+
 </body>
 </html>
