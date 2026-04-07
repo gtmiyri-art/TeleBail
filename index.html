@@ -1,205 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleBail 2.0</title>
+<title>TeleBail Full</title>
 
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-  color:white;
+margin:0;
+font-family:Arial;
+background:#0f0c29;
+color:white;
 }
 
-/* HEADER */
+/* AUTH */
+.container{
+width:90%;
+max-width:400px;
+margin:80px auto;
+background:rgba(255,255,255,0.05);
+padding:20px;
+border-radius:20px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+}
+
+button{
+background:linear-gradient(90deg,red,purple,blue);
+color:white;
+font-weight:bold;
+}
+
+.hidden{display:none}
+
+/* CHAT UI */
+#chatApp{
+display:none;
+}
+
 .header{
-  padding:15px;
-  font-size:20px;
-  font-weight:bold;
-}
-
-/* SEARCH */
-.search-box{
-  margin:10px;
+padding:15px;
+font-size:20px;
+font-weight:bold;
 }
 
 .search-box input{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:20px;
-  outline:none;
-  background:rgba(255,255,255,0.1);
-  color:white;
-}
-
-/* CHAT LIST */
-.chat-list{
-  padding:10px;
-  padding-bottom:120px;
+background:rgba(255,255,255,0.1);
+color:white;
 }
 
 .chat{
-  display:flex;
-  align-items:center;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:15px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(10px);
-  cursor:pointer;
+display:flex;
+padding:10px;
+margin:10px;
+background:rgba(255,255,255,0.05);
+border-radius:10px;
+cursor:pointer;
 }
 
 .chat img{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  margin-right:10px;
+width:40px;
+height:40px;
+border-radius:50%;
+margin-right:10px;
 }
 
-.chat-name{
-  font-weight:bold;
-}
-
-.chat-message{
-  font-size:13px;
-  opacity:0.7;
-}
-
-/* CHAT WINDOW */
 .chat-window{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:#111;
-  padding:15px;
-  box-sizing:border-box;
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#111;
+padding:20px;
 }
 
-.chat-window h3{
-  margin-top:0;
-}
-
-.back-btn{
-  margin-bottom:10px;
-  cursor:pointer;
-  color:#ff4d6d;
-}
-
-/* BOTTOM NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:15px;
-  left:50%;
-  transform:translateX(-50%);
-  width:90%;
-  height:65px;
-  background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(20px);
-  border-radius:30px;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  box-shadow:0 0 20px rgba(255,0,80,0.4);
-}
-
-.nav-item{
-  font-size:22px;
-  opacity:0.6;
-  cursor:pointer;
-}
-
-.nav-item.active{
-  background:linear-gradient(45deg,#ff0057,#ff7b00);
-  padding:12px;
-  border-radius:50%;
-  opacity:1;
-  box-shadow:0 0 15px #ff0057;
-}
-
-.profile-img{
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  border:2px solid #ff0057;
-}
 </style>
 </head>
 <body>
 
-<div class="header">TeleBail Messages</div>
+<!-- LOGIN -->
+<div class="container" id="auth">
 
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search...">
+<h2>TeleBail</h2>
+
+<input type="text" id="email" placeholder="email@bail.com">
+<input type="password" id="pass" placeholder="parol">
+
+<button onclick="login()">Kirish</button>
+
+<p onclick="register()">Ro'yxatdan o'tish</p>
+
 </div>
 
-<div class="chat-list" id="chatList">
+<!-- CHAT APP -->
+<div id="chatApp">
 
-  <div class="chat" onclick="openChat('AntiBail Bot')">
-    <img src="https://i.pravatar.cc/150?img=12">
-    <div>
-      <div class="chat-name">AntiBail Bot</div>
-      <div class="chat-message">Rasmiy kod yuborildi</div>
-    </div>
-  </div>
+<div class="header">TeleBail Chat</div>
 
-  <div class="chat" onclick="openChat('BailPro Support')">
-    <img src="https://i.pravatar.cc/150?img=32">
-    <div>
-      <div class="chat-name">BailPro Support</div>
-      <div class="chat-message">Appeal yuboring</div>
-    </div>
-  </div>
+<div class="search-box">
+<input type="text" id="search" placeholder="Search...">
+</div>
 
-  <div class="chat" onclick="openChat('TeleBail Admin')">
-    <img src="https://i.pravatar.cc/150?img=45">
-    <div>
-      <div class="chat-name">TeleBail Admin</div>
-      <div class="chat-message">Online</div>
-    </div>
-  </div>
+<div id="chatList">
+
+<div class="chat" onclick="openChat('Admin')">
+<img src="https://i.pravatar.cc/150?img=5">
+<div>Admin</div>
+</div>
+
+<div class="chat" onclick="openChat('Support')">
+<img src="https://i.pravatar.cc/150?img=10">
+<div>Support</div>
+</div>
+
+</div>
 
 </div>
 
 <!-- CHAT WINDOW -->
 <div class="chat-window" id="chatWindow">
-  <div class="back-btn" onclick="closeChat()">⬅ Back</div>
-  <h3 id="chatTitle"></h3>
-  <p>Bu yerda chat yozish funksiyasi keyingi versiyada qo‘shiladi.</p>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="nav-item active">💬</div>
-  <div class="nav-item">👤</div>
-  <div class="nav-item">⚙️</div>
-  <img src="https://i.pravatar.cc/150?img=5" class="profile-img">
+<button onclick="closeChat()">⬅ Back</button>
+<h3 id="chatTitle"></h3>
+<p>Chat hali ishlanmoqda...</p>
 </div>
 
 <script>
+
+function register(){
+let email = prompt("Email kiriting (@bail.com)");
+let pass = prompt("Parol (6+)");
+
+if(!email.endsWith("@bail.com")) return alert("Xato email");
+
+localStorage.setItem("email",email);
+localStorage.setItem("pass",pass);
+
+alert("Ro'yxatdan o'tdi");
+}
+
+function login(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("pass").value;
+
+if(email===localStorage.getItem("email") &&
+   pass===localStorage.getItem("pass")){
+
+document.getElementById("auth").style.display="none";
+document.getElementById("chatApp").style.display="block";
+
+}else{
+alert("Xato");
+}
+}
+
 function openChat(name){
-  document.getElementById("chatTitle").innerText = name;
-  document.getElementById("chatWindow").style.display = "block";
+document.getElementById("chatWindow").style.display="block";
+document.getElementById("chatTitle").innerText=name;
 }
 
 function closeChat(){
-  document.getElementById("chatWindow").style.display = "none";
+document.getElementById("chatWindow").style.display="none";
 }
 
-document.getElementById("searchInput").addEventListener("keyup", function(){
-  let filter = this.value.toLowerCase();
-  let chats = document.getElementsByClassName("chat");
-
-  for(let i=0;i<chats.length;i++){
-    let name = chats[i].innerText.toLowerCase();
-    chats[i].style.display = name.includes(filter) ? "" : "none";
-  }
-});
 </script>
 
 </body>
