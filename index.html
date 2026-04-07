@@ -1,168 +1,202 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoinValeuta</title>
+<title>TeleBail 2.0</title>
+
 <style>
 body{
   margin:0;
   font-family:Arial, sans-serif;
-  background:#111;
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
   color:white;
 }
 
-/* ☰ uch chiziq */
-.menu-btn{
-  font-size:28px;
-  padding:12px 16px;
-  cursor:pointer;
+/* HEADER */
+.header{
+  padding:15px;
+  font-size:20px;
+  font-weight:bold;
 }
 
-/* Yon menu */
-.side-menu{
-  height:100%;
-  width:0;
+/* SEARCH */
+.search-box{
+  margin:10px;
+}
+
+.search-box input{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+  background:rgba(255,255,255,0.1);
+  color:white;
+}
+
+/* CHAT LIST */
+.chat-list{
+  padding:10px;
+  padding-bottom:120px;
+}
+
+.chat{
+  display:flex;
+  align-items:center;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:15px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(10px);
+  cursor:pointer;
+}
+.chat img{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  margin-right:10px;
+}
+
+.chat-name{
+  font-weight:bold;
+}
+
+.chat-message{
+  font-size:13px;
+  opacity:0.7;
+}
+
+/* CHAT WINDOW */
+.chat-window{
+  display:none;
   position:fixed;
   top:0;
   left:0;
-  background:#222;
-  overflow-x:hidden;
-  transition:0.3s;
-  padding-top:60px;
-  z-index:1000;
-}
-.side-menu a{
-  padding:12px 24px;
-  text-decoration:none;
-  color:white;
-  display:block;
-  border-bottom:1px solid #333;
-}
-.side-menu a:hover{
-  background:#333;
-}
-.close-btn{
-  position:absolute;
-  top:10px;
-  right:20px;
-  font-size:28px;
-  cursor:pointer;
-}
-
-/* Profil va coin */
-.profile{
-  padding:15px 20px;
-  display:flex;
-  align-items:center;
-}
-.profile img{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  border:2px solid gold;
-  margin-right:12px;
-}
-.coin{
-  background:#222;
-  padding:4px 8px;
-  border-radius:12px;
-  margin-left:auto;
-  font-weight:bold;
-}
-
-/* Katta karta tugmalar */
-.card-container{
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:15px;
-  padding:20px;
-}
-.card{
-  background:#1a1a1a;
-  border-radius:12px;
+  width:100%;
+  height:100%;
+  background:#111;
   padding:15px;
-  text-align:center;
-  cursor:pointer;
-  transition:0.2s;
+  box-sizing:border-box;
 }
-.card:hover{
-  background:#333;
+
+.chat-window h3{
+  margin-top:0;
 }
-.card img{
-  width:60px;
-  height:60px;
+
+.back-btn{
   margin-bottom:10px;
+  cursor:pointer;
+  color:#ff4d6d;
 }
 
-/* Kartalar nomi */
-.card span{
-  font-size:14px;
-  font-weight:bold;
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;
+  bottom:15px;
+  left:50%;
+  transform:translateX(-50%);
+  width:90%;
+  height:65px;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(20px);
+  border-radius:30px;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow:0 0 20px rgba(255,0,80,0.4);
+}.nav-item{
+  font-size:22px;
+  opacity:0.6;
+  cursor:pointer;
 }
 
+.nav-item.active{
+  background:linear-gradient(45deg,#ff0057,#ff7b00);
+  padding:12px;
+  border-radius:50%;
+  opacity:1;
+  box-shadow:0 0 15px #ff0057;
+}
+
+.profile-img{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:2px solid #ff0057;
+}
 </style>
 </head>
 <body>
 
-<!-- ☰ Menu -->
-<span class="menu-btn" onclick="openMenu()">☰</span>
+<div class="header">TeleBail Messages</div>
 
-<div id="menu" class="side-menu">
-  <span class="close-btn" onclick="closeMenu()">×</span>
-  
-  <div class="profile">
-    <img src="profile.png" alt="Profil">
-    <div>
-      <div>M</div>
-      <small>gtmiyri@gmail.com</small>
-    </div>
-    <div class="coin">318 🪙</div>
-  </div>
-  
-  <a href="#">Home</a>
-  <a href="#">Redeem Now</a>
-  <a href="#">History</a>
-  <a href="#">Share</a>
-  <a href="#">Privacy Policy</a>
-  <a href="#">Logout</a>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search...">
 </div>
 
-<!-- Karta tugmalar -->
-<div class="card-container">
-  <div class="card">
-    <img src="checkin.png" alt="Checkin">
-    <span>Checkin</span>
+<div class="chat-list" id="chatList">
+
+  <div class="chat" onclick="openChat('AntiBail Bot')">
+    <img src="https://i.pravatar.cc/150?img=12">
+    <div>
+      <div class="chat-name">AntiBail Bot</div>
+      <div class="chat-message">Rasmiy kod yuborildi</div>
+    </div>
   </div>
-  <div class="card">
-    <img src="math.png" alt="Math Quiz">
-    <span>Math Quizzes</span>
+
+  <div class="chat" onclick="openChat('BailPro Support')">
+    <img src="https://i.pravatar.cc/150?img=32">
+    <div>
+      <div class="chat-name">BailPro Support</div>
+      <div class="chat-message">Appeal yuboring</div>
+    </div>
   </div>
-  <div class="card">
-    <img src="emoji.png" alt="Emoji Quiz">
-    <span>Emoji Quizzes</span>
+
+  <div class="chat" onclick="openChat('TeleBail Admin')">
+    <img src="https://i.pravatar.cc/150?img=45">
+    <div>
+      <div class="chat-name">TeleBail Admin</div>
+      <div class="chat-message">Online</div>
+</div>
   </div>
-  <div class="card">
-    <img src="learn.png" alt="Learn Quiz">
-    <span>Learn Quiz</span>
-  </div>
-  <div class="card">
-    <img src="invite.png" alt="Invite & Earn">
-    <span>Invite & Earn</span>
-  </div>
-  <div class="card">
-    <img src="special.png" alt="Special Offers">
-    <span>Special Offers</span>
-  </div>
+
+</div>
+
+<!-- CHAT WINDOW -->
+<div class="chat-window" id="chatWindow">
+  <div class="back-btn" onclick="closeChat()">⬅ Back</div>
+  <h3 id="chatTitle"></h3>
+  <p>Bu yerda chat yozish funksiyasi keyingi versiyada qo‘shiladi.</p>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active">💬</div>
+  <div class="nav-item">👤</div>
+  <div class="nav-item">⚙️</div>
+  <img src="https://i.pravatar.cc/150?img=5" class="profile-img">
 </div>
 
 <script>
-function openMenu(){
-  document.getElementById("menu").style.width="250px";
+function openChat(name){
+  document.getElementById("chatTitle").innerText = name;
+  document.getElementById("chatWindow").style.display = "block";
 }
-function closeMenu(){
-  document.getElementById("menu").style.width="0";
+
+function closeChat(){
+  document.getElementById("chatWindow").style.display = "none";
 }
+
+document.getElementById("searchInput").addEventListener("keyup", function(){
+  let filter = this.value.toLowerCase();
+  let chats = document.getElementsByClassName("chat");
+
+  for(let i=0;i<chats.length;i++){
+    let name = chats[i].innerText.toLowerCase();
+    chats[i].style.display = name.includes(filter) ? "" : "none";
+  }
+});
 </script>
 
 </body>
