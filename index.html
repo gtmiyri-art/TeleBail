@@ -1,175 +1,92 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleBail Full</title>
+  <meta charset="UTF-8">
+  <title>Metro Runner</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #4facfe, #00f2fe);
+      overflow: hidden;
+    }
 
-<style>
-body{
-margin:0;
-font-family:Arial;
-background:#0f0c29;
-color:white;
-}
+    #startScreen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.6);
+      color: white;
+    }
 
-/* AUTH */
-.container{
-width:90%;
-max-width:400px;
-margin:80px auto;
-background:rgba(255,255,255,0.05);
-padding:20px;
-border-radius:20px;
-}
+    #startScreen h1 {
+      font-size: 50px;
+      margin-bottom: 20px;
+    }
 
-input,button{
-width:100%;
-padding:12px;
-margin:8px 0;
-border:none;
-border-radius:10px;
-}
+    #startBtn {
+      padding: 15px 40px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      background: orange;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-button{
-background:linear-gradient(90deg,red,purple,blue);
-color:white;
-font-weight:bold;
-}
+    #startBtn:hover {
+      background: red;
+    }
 
-.hidden{display:none}
-
-/* CHAT UI */
-#chatApp{
-display:none;
-}
-
-.header{
-padding:15px;
-font-size:20px;
-font-weight:bold;
-}
-
-.search-box input{
-background:rgba(255,255,255,0.1);
-color:white;
-}
-
-.chat{
-display:flex;
-padding:10px;
-margin:10px;
-background:rgba(255,255,255,0.05);
-border-radius:10px;
-cursor:pointer;
-}
-
-.chat img{
-width:40px;
-height:40px;
-border-radius:50%;
-margin-right:10px;
-}
-
-.chat-window{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#111;
-padding:20px;
-}
-
-</style>
+    #gameCanvas {
+      display: none;
+      background: lightgray;
+    }
+  </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="container" id="auth">
-
-<h2>TeleBail</h2>
-
-<input type="text" id="email" placeholder="email@bail.com">
-<input type="password" id="pass" placeholder="parol">
-
-<button onclick="login()">Kirish</button>
-
-<p onclick="register()">Ro'yxatdan o'tish</p>
-
+<div id="startScreen">
+  <h1>Metro Runner</h1>
+  <button id="startBtn">START</button>
 </div>
 
-<!-- CHAT APP -->
-<div id="chatApp">
-
-<div class="header">TeleBail Chat</div>
-
-<div class="search-box">
-<input type="text" id="search" placeholder="Search...">
-</div>
-
-<div id="chatList">
-
-<div class="chat" onclick="openChat('Admin')">
-<img src="https://i.pravatar.cc/150?img=5">
-<div>Admin</div>
-</div>
-
-<div class="chat" onclick="openChat('Support')">
-<img src="https://i.pravatar.cc/150?img=10">
-<div>Support</div>
-</div>
-
-</div>
-
-</div>
-
-<!-- CHAT WINDOW -->
-<div class="chat-window" id="chatWindow">
-<button onclick="closeChat()">⬅ Back</button>
-<h3 id="chatTitle"></h3>
-<p>Chat hali ishlanmoqda...</p>
-</div>
+<canvas id="gameCanvas" width="800" height="400"></canvas>
 
 <script>
+  const startBtn = document.getElementById("startBtn");
+  const startScreen = document.getElementById("startScreen");
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
 
-function register(){
-let email = prompt("Email kiriting (@bail.com)");
-let pass = prompt("Parol (6+)");
+  startBtn.onclick = () => {
+    startScreen.style.display = "none";
+    canvas.style.display = "block";
+    startGame();
+  };
 
-if(!email.endsWith("@bail.com")) return alert("Xato email");
+  function startGame() {
+    let x = 50;
 
-localStorage.setItem("email",email);
-localStorage.setItem("pass",pass);
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-alert("Ro'yxatdan o'tdi");
-}
+      // player
+      ctx.fillStyle = "blue";
+      ctx.fillRect(x, 300, 50, 50);
 
-function login(){
-let email=document.getElementById("email").value;
-let pass=document.getElementById("pass").value;
+      x += 2;
 
-if(email===localStorage.getItem("email") &&
-   pass===localStorage.getItem("pass")){
+      requestAnimationFrame(gameLoop);
+    }
 
-document.getElementById("auth").style.display="none";
-document.getElementById("chatApp").style.display="block";
-
-}else{
-alert("Xato");
-}
-}
-
-function openChat(name){
-document.getElementById("chatWindow").style.display="block";
-document.getElementById("chatTitle").innerText=name;
-}
-
-function closeChat(){
-document.getElementById("chatWindow").style.display="none";
-}
-
+    gameLoop();
+  }
 </script>
 
 </body>
