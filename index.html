@@ -1,92 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Metro Runner</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #4facfe, #00f2fe);
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<title>Atabaev Miytibek Game</title>
 
-    #startScreen {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0,0,0,0.6);
-      color: white;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: skyblue;
+}
 
-    #startScreen h1 {
-      font-size: 50px;
-      margin-bottom: 20px;
-    }
+/* START SCREEN */
+#startScreen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-    #startBtn {
-      padding: 15px 40px;
-      font-size: 20px;
-      border: none;
-      border-radius: 10px;
-      background: orange;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+#startBtn {
+  padding: 15px 40px;
+  font-size: 20px;
+  background: orange;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
 
-    #startBtn:hover {
-      background: red;
-    }
+/* GAME UI */
+#topBar {
+  position: absolute;
+  width: 100%;
+  top: 10px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
 
-    #gameCanvas {
-      display: none;
-      background: lightgray;
-    }
-  </style>
+canvas {
+  display: none;
+  background: lightgreen;
+}
+
+/* Controls */
+.controls {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+button.control {
+  width: 100px;
+  height: 80px;
+  font-size: 20px;
+}
+</style>
 </head>
+
 <body>
 
 <div id="startScreen">
-  <h1>Metro Runner</h1>
+  <h1>🚗 Hill Game</h1>
   <button id="startBtn">START</button>
 </div>
 
-<canvas id="gameCanvas" width="800" height="400"></canvas>
+<div id="topBar">Atabaev Miytibek</div>
+
+<canvas id="game" width="800" height="400"></canvas>
+
+<div class="controls">
+  <button class="control" id="brake">BRAKE</button>
+  <button class="control" id="gas">GAS</button>
+</div>
 
 <script>
-  const startBtn = document.getElementById("startBtn");
-  const startScreen = document.getElementById("startScreen");
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
+const startBtn = document.getElementById("startBtn");
+const startScreen = document.getElementById("startScreen");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-  startBtn.onclick = () => {
-    startScreen.style.display = "none";
-    canvas.style.display = "block";
-    startGame();
-  };
+let speed = 0;
+let x = 100;
 
-  function startGame() {
-    let x = 50;
+startBtn.onclick = () => {
+  startScreen.style.display = "none";
+  canvas.style.display = "block";
+  startGame();
+};
 
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+// Controls
+document.getElementById("gas").onmousedown = () => speed += 1;
+document.getElementById("brake").onmousedown = () => speed -= 1;
 
-      // player
-      ctx.fillStyle = "blue";
-      ctx.fillRect(x, 300, 50, 50);
+// Mobile touch
+document.getElementById("gas").ontouchstart = () => speed += 1;
+document.getElementById("brake").ontouchstart = () => speed -= 1;
 
-      x += 2;
+function startGame() {
+  function loop() {
+    ctx.clearRect(0, 0, 800, 400);
 
-      requestAnimationFrame(gameLoop);
+    // yer (hill)
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.moveTo(0,300);
+    for(let i=0;i<800;i++){
+      ctx.lineTo(i, 300 + Math.sin(i*0.02)*20);
     }
+    ctx.lineTo(800,400);
+    ctx.lineTo(0,400);
+    ctx.fill();
 
-    gameLoop();
+    // mashina
+    ctx.fillStyle = "red";
+    ctx.fillRect(x, 250, 50, 30);
+
+    x += speed;
+
+    requestAnimationFrame(loop);
   }
+  loop();
+}
 </script>
 
 </body>
